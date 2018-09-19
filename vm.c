@@ -1,7 +1,10 @@
 
 #include "corewar.h"
 #include <stdio.h>
-
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 /* global array representing VM memory */
 char		g_mem[MEM_SIZE];
@@ -55,8 +58,8 @@ void	get_params(int pc)
 		}
 		else if (g_param_types[i] == 4)
 		{
-			memcpy(&g_env.regs[i], &g_mem[pc+inc], INC_SIZE);
-			inc += INC_SIZE;
+			memcpy(&g_env.regs[i], &g_mem[pc+inc], IND_SIZE);
+			inc += IND_SIZE;
 		}
 		else
 			break ;
@@ -67,11 +70,11 @@ void	get_params(int pc)
 }
 
 /* fills execution environment (registers and op-code)  */
-int	decode(int pc)
+void	decode(int pc)
 {
-	get_op_code();
-	get_formatting();
-	get_params();
+	get_op_code(pc);
+	get_formatting(pc);
+	get_params(pc);
 }
 
 /* runs op_code on data stored in registers 
@@ -84,11 +87,22 @@ int	exec()
 /* load binary into VM memory */
 void	load_binary()
 {
-	
+	int	fd;
+	int n_read;
+	char c;
+	int i;
+
+	i = 0;
+	n_read = 0;
+	fd = open("binary.cor" , O_RDONLY);
+	lseek(fd, 2192, SEEK_SET);
+	while ((n_read = read(fd, &c, 1)))
+			g_mem[i++] = c;
 }
 
 int	main(int ac, char **av)
 {
-
+	load_binary();
+	printf("> %s\n", g_mem);
 	return 0;
 }
