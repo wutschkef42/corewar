@@ -1,3 +1,5 @@
-
+corewar
+obj/
+*.cor
 .*.swp
 *.swp
