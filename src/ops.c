@@ -9,10 +9,11 @@
 /* live */
 void	live(int pc)
 {
-	int	n;
+	unsigned int	n;
 
+	printf("byte1: %hhX, byte2: %hhX, byte3: %hhX, byte4: %hhX\n", VMMEM(pc+1), VMMEM(pc+2), VMMEM(pc+3), VMMEM(pc+4));
 	n = (g_mem[pc+1] << 24) + (g_mem[pc+2] << 16) + (g_mem[pc+3] << 8) + g_mem[pc+4];
-	printf("I'm alive %d(player_name)\n", n);
+	printf("I'm alive %zu(player_name)\n", n);
 	(void)pc;
 }
 
