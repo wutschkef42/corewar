@@ -2,3 +2,45 @@
 .comment "just a basic living prog"
 		
 	live %-255
+	live %-255
+	live %-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	live %-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	live %-255
+	live %-255
+	live %-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	live %-255
+	live %-255
+	live %-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	st	r1,-255
+	live %-255
+	st	r1,-255
+	st	r1,-255
+	live %-255
+	live %-255
+	live %-255
+	live %-255
+	live %-255
+	st	r1,-255

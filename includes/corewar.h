@@ -3,14 +3,34 @@
 # define COREWAR_H
 
 #include "op.h"
-#include <stdio.h> // WARNING
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
 
 #define HEADER_SIZE 0x890
 #define TREG 1
 #define TDIR 2
 #define TIND 3
 
+#define LIVE 1
+#define LOAD 2
+#define STORE 3
 
+#define REGNO(i) g_env.regno[i]
+#define PARAM(i) g_params.no[i]
+#define TPARAM(i) g_params.type[i]
+#define VMMEM(i) g_mem[i]
+
+/*
+ * current operation of process, waiting for cooldown before being executed
+*/
+typedef struct	s_cur_op
+{
+	int	opcode;
+	int	cooldown;	// remaining cooldown
+}				t_cur_op;
 
 /*
  * describes one instruction of the VM's instruction set
@@ -21,7 +41,7 @@ typedef struct	s_op
 	int		nparams;
 	int		tparams[MAX_ARGS_NUMBER];
 	int		opcode;
-	int		ncycles;
+	int		cooldown;
 	char	*descr;
 	int		affect_carry;
 	int		index;
@@ -33,10 +53,11 @@ typedef struct	s_op
 // there can be arbitrarily many processes because they can fork themselves
 typedef struct	s_exec_env
 {
-	int		regno[REG_NUMBER];
-	int		pc;
-	int		carry;
-	char	op_code;
+	int			regno[REG_NUMBER];
+	int			pc;
+	int			carry;
+	char		is_alive;
+	t_cur_op	cur_op;
 }				t_exec_env;
 
 typedef struct	s_param
@@ -50,6 +71,14 @@ typedef struct	s_param
 void	live(int pc);
 void	ld(int pc);
 void	st(int pc);
+
+/* vm_loop.c */
+void    vm_loop();
+
+/* vm.c */
+void	exec(int pc);
+
+
 
 /* GLOBAL DATA */
 

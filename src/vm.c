@@ -1,22 +1,18 @@
 
 #include "corewar.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
+
 
 
 void (*g_ops[])(int) = {live, ld, st};
 
-#define CUR_OP	g_env.op_code - 1
+#define CUR_OP	g_env.cur_op.opcode - 1
 
 
 /* read op_code from memory and store it in execution environment */
 void	get_op_code(int pc)
 {
 	printf("get_op_code(): %02X\n", g_mem[pc]);
-	g_env.op_code = g_mem[pc];
+	g_env.cur_op.opcode = g_mem[pc];
 }
 
 
@@ -30,7 +26,6 @@ void	get_formatting(int pc)
 	char	enc_byte;
 
 	printf("get_formatting(): ");
-	write(1, &g_mem[pc+1], 3);
 	enc_byte = g_mem[pc+1];
 	printf("enc_byte: %02hhX \n", enc_byte);
 	g_params.type[0] = (enc_byte >> 6) & 0x3;
@@ -113,7 +108,7 @@ int	decode(int pc)
 	int inc;
 
 	inc = 0;
-	get_op_code(pc);
+	get_op_code(pc); // Can opcode and params be corrupted during cooldown
 	get_formatting(pc);
 	get_params(pc);
 	return (inc);
@@ -167,8 +162,9 @@ int	main(int ac, char **av)
 	if (ac != 2)
 		exit(0);
 	load_binary(av[1]);
-	print_hexdump();
-	exec(0);
-	print_hexdump();
+	//print_hexdump();
+	//exec(0);
+	vm_loop();
+	//print_hexdump();
 	return 0;
 }

@@ -9,6 +9,7 @@ LIB_DIR		= ./lib
 
 
 SRC			= vm.c \
+			  vm_loop.c \
 			  ops.c 
 
 OBJ			= $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))

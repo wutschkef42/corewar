@@ -2,12 +2,12 @@
 #include "corewar.h"
 #include <string.h> 
 
-#define REGNO(i) g_env.regno[i]
-#define PARAM(i) g_params.no[i]
-#define VMMEM(i) g_mem[i]
 
 
-/* live */
+
+/* live
+ * sets the is_alive flag in processes global memory
+*/
 void	live(int pc)
 {
 	unsigned int	n;
@@ -15,13 +15,28 @@ void	live(int pc)
 	printf("byte1: %hhX, byte2: %hhX, byte3: %hhX, byte4: %hhX\n", VMMEM(pc+1), VMMEM(pc+2), VMMEM(pc+3), VMMEM(pc+4));
 	n = (g_mem[pc+1] << 24) | ((unsigned char)(g_mem[pc+2]) << 16) | ((unsigned char)(g_mem[pc+3]) << 8) | (unsigned char)g_mem[pc+4];	
 	printf("I'm alive %d(player_name)\n", n);
+	g_env.is_alive = 1;
 	(void)pc;
 }
 
-/* load */
+/* load 
+ * NOTE ld affects carry, not implemented yet
+*/
 void	ld(int pc)
 {
-	(void)pc;
+	int tmp;
+	
+	printf("load()\n");
+	tmp = 0;
+	if (TPARAM(0) == TIND)
+	{
+		REGNO(PARAM(1)) = VMMEM(pc + PARAM(0));
+	}
+	else if (TPARAM(0) == TDIR)
+	{
+		REGNO(PARAM(1)) = PARAM(0);
+	}
+	
 }
 
 /* store
@@ -33,6 +48,7 @@ void	ld(int pc)
 */
 void	st(int pc)
 {
+	printf("store(), cooldown: %d\n", g_env.cur_op.cooldown);
 	if (g_params.type[1] == TREG) // here store in register
 	{
 		REGNO(PARAM(1)) = REGNO(PARAM(0));
