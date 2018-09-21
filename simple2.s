@@ -1,4 +1,4 @@
 .name "zork"
 .comment "just a basic living prog"
 		
-	live %254
+	live %-255

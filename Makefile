@@ -15,7 +15,8 @@ OBJ			= $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
 
 CC			= gcc
-CFLAGS		= -Wall -Werror -Wextra
+CFLAGS          = 
+CFLAG		= -Wall -Werror -Wextra
 
 
 L_FT		= $(LIB_DIR)/libft

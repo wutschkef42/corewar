@@ -1,4 +1,4 @@
 .name "zork"
 .comment "just a basic living prog"
 		
-	st	r1,4
+	st	r1,-255
