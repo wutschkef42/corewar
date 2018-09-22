@@ -5,7 +5,8 @@
 
 
 
-/* live
+/* 
+ *							live(0x01)
  * sets the is_alive flag in processes global memory
 */
 void	live(int pc)
@@ -19,7 +20,8 @@ void	live(int pc)
 	(void)pc;
 }
 
-/* load 
+/* 
+ *							load(0x02)
  * NOTE ld affects carry, not implemented yet
  * two cases:
  *  1. 34%,r3 -> load 34 to r3
@@ -39,7 +41,8 @@ void	ld(int pc)
 	}	
 }
 
-/* store
+/* 
+ *							store(0x03)
  * WARNING no input validation
  * two cases:
  *	1. r1,r2 -> store value from env.r1 in r2
@@ -61,8 +64,32 @@ void	st(int pc)
 	}
 }
 
+/* 
+ *							add(0x04)
+ * This instruction takes 3 registers as parameter, 
+ * adds the contents of the 2 first and stores the result in the third. 
+ * This operation modifies the carry. 
+ * add r2,r3,r5 adds r2 and r3 and stores the result in r5.
+*/
 
-
+//int	add(int pc)
+void	add(int pc)
+{
+	printf("add() : adding r%d(%d) and r%d(%d)", PARAM(0), REGNO(PARAM(0)), PARAM(1), REGNO(PARAM(1)));
+	if(TPARAM(0) == TREG && TPARAM(1) == TREG && PARAM(2) == TREG)
+	{
+		REGNO(PARAM(2)) = REGNO(PARAM(0)) + REGNO((PARAM(1)));
+		CARRY = 1;
+		printf(" storing in r%d(%d)\n",  PARAM(2), REGNO(PARAM(2)));
+	//	return(1);
+	}
+	else
+	{
+		CARRY = 0;
+		fprintf(stderr, "wrong parameters type in instruction add");
+	}
+	//return(0);
+}
 
 /* calculate position of next program counter
 int	calc_next_pc()

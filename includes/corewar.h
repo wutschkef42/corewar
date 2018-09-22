@@ -17,10 +17,15 @@
 #define LIVE 1
 #define LOAD 2
 #define STORE 3
+#define ADD 4
 
-#define REGNO(i) g_env.regno[i]
+#define CARRY		g_env.carry
+#define REGNO(i)	g_env.regno[i]
+#define CUROP 		g_env.cur_op.opcode
+
 #define PARAM(i) g_params.no[i]
 #define TPARAM(i) g_params.type[i]
+
 #define VMMEM(i) g_mem[i]
 
 /*
@@ -71,6 +76,7 @@ typedef struct	s_param
 void	live(int pc);
 void	ld(int pc);
 void	st(int pc);
+void	add(int pc);
 
 /* vm_loop.c */
 void    vm_loop();
