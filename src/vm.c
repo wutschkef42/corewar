@@ -3,10 +3,7 @@
 
 
 
-void (*g_ops[])(int) = {live, ld, st};
-
-#define CUR_OP	g_env.cur_op.opcode - 1
-
+void (*g_ops[])(int) = {0, live, ld, st, add, sub, and, or, xor};
 
 /* read op_code from memory and store it in execution environment */
 void	get_op_code(int pc)
@@ -120,7 +117,7 @@ int	decode(int pc)
 void	exec(int pc)
 {
 	decode(pc);
-	g_ops[CUR_OP](pc);
+	g_ops[CUROP](pc);
 }
 
 /* load binary into VM memory */
