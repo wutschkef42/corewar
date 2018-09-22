@@ -6,6 +6,7 @@
 
 t_op    op_tab[17] =
 {
+	{0, 0, {0}, 0, 0, 0, 0, 0},
 	{"live", 1, {T_DIR}, 1, 10, "alive", 0, 0},
 	{"ld", 2, {T_DIR | T_IND, T_REG}, 2, 5, "load", 1, 0},
 	{"st", 2, {T_REG, T_IND | T_REG}, 3, 5, "store", 1, 0},
@@ -27,8 +28,7 @@ t_op    op_tab[17] =
 	{"lldi", 3, {T_REG | T_DIR | T_IND, T_DIR | T_REG, T_REG}, 14, 50,
 		"long load index", 1, 1},
 	{"lfork", 1, {T_DIR}, 15, 1000, "long fork", 0, 1},
-	{"aff", 1, {T_REG}, 16, 2, "aff", 1, 0},
-	{0, 0, {0}, 0, 0, 0, 0, 0}
+	{"aff", 1, {T_REG}, 16, 2, "aff", 1, 0}
 };
 
 /*
@@ -56,7 +56,7 @@ int     size_of_params()
     while (i < MAX_ARGS_NUMBER)
     {
         if (TPARAM(i) == TREG)
-            size += REG_SIZE;
+            size += 1;
         else if (TPARAM(i) == TDIR)
             size += DIR_SIZE;
         else if (TPARAM(i) == TIND)
@@ -73,6 +73,7 @@ int     calc_instruction_size()
         return (5);
     else if (CUROP == LOAD || CUROP == STORE) // 1byte for opcode, 1byte for encoding, + some bytes for params
     {
+        //return (4);
         return (2 + size_of_params());
     }
     return (-1); // ERROR
@@ -115,12 +116,13 @@ void    vm_loop()
     start_process();
     init_champion();
     cycle_count = 0;
-    cycle2die = CYCLE_TO_DIE;
+    cycle2die = 50;//CYCLE_TO_DIE;
     while(g_env.is_alive)
     {
         g_env.is_alive = 0;
         while (cycle_count < cycle2die)
         {
+            printf("CurOP.CD : %d\n", g_env.cur_op.cooldown);
             cycle_count++;
             g_env.cur_op.cooldown--;
             if (g_env.cur_op.cooldown == 0)
@@ -131,13 +133,16 @@ void    vm_loop()
                     printf("CRASH\n");
                     exit(1);
                 }
+                printf("-----------------------------------------------------------------------------\n");
                 exec(g_env.pc);
                 // get the next instruction
                 fetch_instruction();
                 // clear old parameters from global memory
                 clear_params();
                 // reset cooldown to whatever next instruction requires
+                printf("-----------------------------------------------------------------------------\n");
             }
+                printf("cycle2die : %d, cycle_count : %d\n", cycle2die, cycle_count);
             usleep(100);   
         }
         cycle2die -= CYCLE_DELTA;

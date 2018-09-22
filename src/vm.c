@@ -162,9 +162,9 @@ int	main(int ac, char **av)
 	if (ac != 2)
 		exit(0);
 	load_binary(av[1]);
-	//print_hexdump();
+	print_hexdump();
 	//exec(0);
 	vm_loop();
-	//print_hexdump();
+	print_hexdump();
 	return 0;
 }
