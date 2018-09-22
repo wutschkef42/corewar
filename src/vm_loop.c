@@ -42,7 +42,6 @@ void    init_champion()
     g_env.pc = 0;
     g_env.cur_op.opcode = g_mem[g_env.pc];
     g_env.cur_op.cooldown = op_tab[g_mem[g_env.pc]].cooldown;
-    printf("COOLDOWN: %d\n", g_env.cur_op.cooldown);
 }
 
 /* calculates how many bytes the params take up */
@@ -116,13 +115,12 @@ void    vm_loop()
     start_process();
     init_champion();
     cycle_count = 0;
-    cycle2die = 50;//CYCLE_TO_DIE;
+    cycle2die = CYCLE_TO_DIE;
     while(g_env.is_alive)
     {
         g_env.is_alive = 0;
         while (cycle_count < cycle2die)
         {
-            printf("CurOP.CD : %d\n", g_env.cur_op.cooldown);
             cycle_count++;
             g_env.cur_op.cooldown--;
             if (g_env.cur_op.cooldown == 0)
@@ -142,7 +140,6 @@ void    vm_loop()
                 // reset cooldown to whatever next instruction requires
                 printf("-----------------------------------------------------------------------------\n");
             }
-                printf("cycle2die : %d, cycle_count : %d\n", cycle2die, cycle_count);
             usleep(100);   
         }
         cycle2die -= CYCLE_DELTA;

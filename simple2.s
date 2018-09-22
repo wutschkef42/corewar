@@ -1,46 +1,9 @@
 .name "zork"
 .comment "just a basic living prog"
 		
-	live %-255
-	live %-255
-	live %-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	live %-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	live %-255
-	live %-255
-	live %-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	live %-255
-	live %-255
-	live %-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	st	r1,-255
-	live %-255
-	st	r1,-255
-	st	r1,-255
-	live %-255
-	live %-255
-	live %-255
-	live %-255
-	live %-255
-	st	r1,-255
+	ld	%170,r1 
+	st	r1, 115
+	st	r1, 111
+	st	r1, 106
+	st	r1, 102
+	st	r1, 98

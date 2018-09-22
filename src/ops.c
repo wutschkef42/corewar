@@ -21,13 +21,14 @@ void	live(int pc)
 
 /* load 
  * NOTE ld affects carry, not implemented yet
+ * two cases:
+ *  1. 34%,r3 -> load 34 to r3
+ *  2. 34,r3  -> load value from mem address (pc + 34) to r3
+ * VMEM(DIR | IND) -> REGNO
 */
 void	ld(int pc)
-{
-	int tmp;
-	
+{	
 	printf("load()\n");
-	tmp = 0;
 	if (TPARAM(0) == TIND)
 	{
 		REGNO(PARAM(1)) = VMMEM(pc + PARAM(0));
@@ -35,16 +36,15 @@ void	ld(int pc)
 	else if (TPARAM(0) == TDIR)
 	{
 		REGNO(PARAM(1)) = PARAM(0);
-	}
-	
+	}	
 }
 
 /* store
  * WARNING no input validation
  * two cases:
- *	1. r1,r2 -> store value from r1 in r2
- *	2. r1,34 -> store value from r1 in mem address (pc + 34)
-
+ *	1. r1,r2 -> store value from env.r1 in r2
+ *	2. r1,34 -> store value from env.r1 in mem address (pc + 34)
+ * REGNO -> VMEM(IND) | REGNO
 */
 void	st(int pc)
 {
@@ -56,8 +56,8 @@ void	st(int pc)
 	}
 	else // here store in VM memory
 	{
-		printf("st(): param0: %d, param1: %d, reg1: %d\n", PARAM(0), PARAM(1), REGNO(PARAM(0)));
-		VMMEM(pc+PARAM(1)) = REGNO(PARAM(0));
+		VMMEM(pc + PARAM(1)) = REGNO(PARAM(0));
+		printf("st(): param0: %d, param1: %d, reg%d: %d\n", PARAM(0), PARAM(1), PARAM(0), REGNO(PARAM(0)));
 	}
 }
 
