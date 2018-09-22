@@ -1,5 +1,4 @@
 
-
 #include "corewar.h"
 
 t_op    op_tab[17] =
@@ -68,9 +67,9 @@ int     calc_instruction_size()
 {
     if (CUROP == LIVE) // 1byte for opcode, 4 bytes for param, no encoding byte
         return (5);
-    else if (CUROP == LOAD || CUROP == STORE || CUROP == ADD) // 1byte for opcode, 1byte for encoding, + some bytes for params
+    else if (CUROP == LOAD || CUROP == STORE || CUROP == ADD || CUROP == SUB
+    || CUROP == AND || CUROP == OR || CUROP == XOR) // 1byte for opcode, 1byte for encoding, + some bytes for params
     {
-        //return (4);
         return (2 + size_of_params());
     }
     return (-1); // ERROR
@@ -86,7 +85,6 @@ void    fetch_instruction()
     g_env.pc += calc_instruction_size();   
     CUROP = VMMEM(g_env.pc);
     g_env.cur_op.cooldown = op_tab[CUROP].cooldown;
-
 }
 
 /* turn the process alive */

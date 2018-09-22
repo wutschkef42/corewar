@@ -3,7 +3,7 @@
 
 
 
-void (*g_ops[])(int) = {0, live, ld, st, add};
+void (*g_ops[])(int) = {0, live, ld, st, add, sub, and, or, xor};
 
 /* read op_code from memory and store it in execution environment */
 void	get_op_code(int pc)

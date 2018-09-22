@@ -10,14 +10,19 @@
 #include <string.h>
 
 #define HEADER_SIZE 0x890
+
 #define TREG 1
 #define TDIR 2
 #define TIND 3
 
-#define LIVE 1
-#define LOAD 2
-#define STORE 3
-#define ADD 4
+#define LIVE	1
+#define LOAD	2
+#define STORE	3
+#define ADD		4
+#define AND		5
+#define SUB 	6 
+#define OR 		7 
+#define XOR		8 
 
 #define CARRY		g_env.carry
 #define REGNO(i)	g_env.regno[i]
@@ -77,6 +82,10 @@ void	live(int pc);
 void	ld(int pc);
 void	st(int pc);
 void	add(int pc);
+void	sub(int pc);
+void	and(int pc);
+void	or(int pc);
+void	xor(int pc);
 
 /* vm_loop.c */
 void    vm_loop();
