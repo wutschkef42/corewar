@@ -61,6 +61,9 @@ void	st(int pc)
 	}
 }
 
+
+
+
 /* calculate position of next program counter
 int	calc_next_pc()
 {
