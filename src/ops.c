@@ -41,7 +41,7 @@ void	ld(int pc)
 	printf("load()\n");
 	if (TPARAM(0) == TIND)
 	{
-		REGNO(PARAM(1)) = char2int(pc, PARAM(0), REG_SIZE);//; VMMEM(pc + PARAM(0));
+		REGNO(PARAM(1)) = char2int(pc, PARAM(0) % IDX_MOD, REG_SIZE);
 	}
 	else if (TPARAM(0) == TDIR)
 	{
@@ -75,7 +75,7 @@ void	st(int pc)
 	else // here store in VM memory
 	{
 		int2char();
-		VMMEM(pc + PARAM(1)) = REGNO(PARAM(0));
+		VMMEM(pc + PARAM(1) % IDX_MOD) = REGNO(PARAM(0));
 		printf("st(): param0: %d, param1: %d, reg%d: %d\n", PARAM(0), PARAM(1), PARAM(0), REGNO(PARAM(0)));
 	}
 	CARRY = 1;
@@ -144,19 +144,19 @@ void	and(int pc)
 		if (TPARAM(0) == TREG && TPARAM(1) == TREG)
 			REGNO(PARAM(2)) = REGNO(PARAM(0)) & REGNO(PARAM(1));
 		else if (TPARAM(0) == TREG && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = REGNO(PARAM(0)) & VMMEM(pc + PARAM(1));
+			REGNO(PARAM(2)) = REGNO(PARAM(0)) & VMMEM(pc + PARAM(1) % IDX_MOD);
 		else if (TPARAM(0) == TREG && TPARAM(1) == TDIR)
 			REGNO(PARAM(2)) = REGNO(PARAM(0)) & (PARAM(1));
 		else if (TPARAM(0) == TIND && TPARAM(1) == TREG)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0)) & REGNO(PARAM(1));
+			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) & REGNO(PARAM(1));
 		else if (TPARAM(0) == TIND && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0)) & VMMEM(pc + PARAM(1));
+			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) & VMMEM(pc + PARAM(1) % IDX_MOD);
 		else if (TPARAM(0) == TIND && TPARAM(1) == TDIR)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0)) & PARAM(1);
+			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) & PARAM(1);
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TREG)
 			REGNO(PARAM(2)) = PARAM(0) & REGNO(PARAM(1));
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = PARAM(0) & VMMEM(pc + PARAM(1));
+			REGNO(PARAM(2)) = PARAM(0) & VMMEM(pc + PARAM(1) % IDX_MOD);
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TDIR)
 			REGNO(PARAM(2)) = PARAM(0) & PARAM(1);
 		// NEED TO DOUBLE CHECK AND MAYBE TERNAIRE ALL THIS SHIT
@@ -185,19 +185,19 @@ void	or(int pc)
 		if (TPARAM(0) == TREG && TPARAM(1) == TREG)
 			REGNO(PARAM(2)) = REGNO(PARAM(0)) | REGNO(PARAM(1));
 		else if (TPARAM(0) == TREG && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = REGNO(PARAM(0)) | VMMEM(pc + PARAM(1));
+			REGNO(PARAM(2)) = REGNO(PARAM(0)) | VMMEM(pc + PARAM(1) % IDX_MOD);
 		else if (TPARAM(0) == TREG && TPARAM(1) == TDIR)
 			REGNO(PARAM(2)) = REGNO(PARAM(0)) | (PARAM(1));
 		else if (TPARAM(0) == TIND && TPARAM(1) == TREG)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0)) | REGNO(PARAM(1));
+			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) | REGNO(PARAM(1));
 		else if (TPARAM(0) == TIND && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0)) | VMMEM(pc + PARAM(1));
+			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) | VMMEM(pc + PARAM(1) % IDX_MOD);
 		else if (TPARAM(0) == TIND && TPARAM(1) == TDIR)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0)) | PARAM(1);
+			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) | PARAM(1);
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TREG)
 			REGNO(PARAM(2)) = PARAM(0) | REGNO((PARAM(1)));
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = PARAM(0) | VMMEM(pc + PARAM(1));
+			REGNO(PARAM(2)) = PARAM(0) | VMMEM(pc + PARAM(1) % IDX_MOD);
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TDIR)
 			REGNO(PARAM(2)) = PARAM(0) | PARAM(1);
 		// NEED TO DOUBLE CHECK AND MAYBE TERNAIRE ALL THIS SHIT
@@ -227,19 +227,19 @@ void	xor(int pc)
 		if (TPARAM(0) == TREG && TPARAM(1) == TREG)
 			REGNO(PARAM(2)) = REGNO(PARAM(0)) ^ REGNO(PARAM(1));
 		else if (TPARAM(0) == TREG && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = REGNO(PARAM(0)) ^ VMMEM(pc + PARAM(1));
+			REGNO(PARAM(2)) = REGNO(PARAM(0)) ^ VMMEM(pc + PARAM(1) % IDX_MOD);
 		else if (TPARAM(0) == TREG && TPARAM(1) == TDIR)
 			REGNO(PARAM(2)) = REGNO(PARAM(0)) ^ (PARAM(1));
 		else if (TPARAM(0) == TIND && TPARAM(1) == TREG)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0)) ^ REGNO(PARAM(1));
+			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) ^ REGNO(PARAM(1));
 		else if (TPARAM(0) == TIND && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0)) ^ VMMEM(pc + PARAM(1));
+			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) ^ VMMEM(pc + PARAM(1) % IDX_MOD);
 		else if (TPARAM(0) == TIND && TPARAM(1) == TDIR)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0)) ^ PARAM(1);
+			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) ^ PARAM(1);
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TREG)
 			REGNO(PARAM(2)) = PARAM(0) ^ REGNO((PARAM(1)));
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = PARAM(0) ^ VMMEM(pc + PARAM(1));
+			REGNO(PARAM(2)) = PARAM(0) ^ VMMEM(pc + PARAM(1) % IDX_MOD);
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TDIR)
 			REGNO(PARAM(2)) = PARAM(0) ^ PARAM(1);
 		// NEED TO DOUBLE CHECK AND MAYBE TERNAIRE ALL THIS SHIT
