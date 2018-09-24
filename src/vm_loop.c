@@ -111,7 +111,7 @@ void    vm_loop()
     start_process();
     init_champion();
     cycle_count = 0;
-    cycle2die =         CYCLE_TO_DIE;
+    cycle2die = CYCLE_TO_DIE;
     while(g_env.is_alive)
     {
         g_env.is_alive = 0;

@@ -38,9 +38,31 @@
 */
 typedef struct	s_cur_op
 {
+	int	pid;		// to know which process the operation belongs to
 	int	opcode;
 	int	cooldown;	// remaining cooldown
 }				t_cur_op;
+
+
+/*
+ * represents a champion, champions are chained together in a list
+ */
+typedef struct	s_process
+{
+	int					pid;
+	t_exec_env			exec_env;
+	struct s_process	*next;
+}				t_process;
+
+
+/*
+ * list of currently running operations (each process has an active operation that's waiting for cooldown)
+ */
+typedef struct	s_op_queue
+{
+	t_cur_op			op;
+	struct s_op_queue	*next;
+}				t_op_queue;
 
 /*
  * describes one instruction of the VM's instruction set
