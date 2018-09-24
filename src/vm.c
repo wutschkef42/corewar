@@ -31,32 +31,47 @@ void	get_formatting(int pc)
 	printf("%02X %02X %02X\n", g_params.type[0], g_params.type[1], g_params.type[2]);		
 }
 
+/* 
+* convert an integer into between 1 and 4 chars
+*/
+
+void	int2char(int pc, int inc, int size, int regno)
+{
+	int i;
+
+	i = 0;
+	while(i < size)
+	{
+		VMMEM(pc + inc + size - 1 - i) = (REGNO(regno) << (i * 8)) & 0XFF;
+		i++;
+	}
+}
 
 /* convert between 1 and 4 chars into an integer
  * useful for storing indirect parameters in integer register
  * negative numbers must be handled separately because the leading bits must be filled with 1s
  * (unsigned char) casts are necessary to supress sign extension
 */
-int		char2int(int pc, int inc)
+int		char2int(int pc, int inc, int size)
 {
 	unsigned int	ret;
 	char			is_neg;
 
 	is_neg = (g_mem[pc+inc] & 0xA0) ? 1 : 0;
 	ret = 0;
-	if (IND_SIZE == 1)
+	if (size == 1)
 		ret = (is_neg) ? g_mem[pc+inc] | 0xFFFFFF << 8 : g_mem[pc+inc];
-	else if (IND_SIZE == 2)
+	else if (size == 2)
 	{
 		ret = (g_mem[pc+inc] << 8) | (unsigned char)g_mem[pc+inc+1];
 		ret = (is_neg) ? ret | 0xFFFF << 16 : ret;
 	}
-	else if (IND_SIZE == 3)
+	else if (size == 3)
 	{
 		ret = (g_mem[pc+inc] << 16) | ((unsigned char)(g_mem[pc+inc+1]) << 8) | (unsigned char)g_mem[pc+inc+2];
 		ret = (is_neg) ? ret | 0xFF << 8 : ret;
 	}
-	else if (IND_SIZE == 4)
+	else if (size == 4)
 		ret = (g_mem[pc+inc] << 24) | ((unsigned char)(g_mem[pc+inc+1]) << 16) | ((unsigned char)(g_mem[pc+inc+2]) << 8) | (unsigned char)g_mem[pc+inc+3];	
 	else
 		printf("ERROR: IND_SIZE too big.\n");			
@@ -83,13 +98,13 @@ void	get_params(int pc)
 		}
 		else if (g_params.type[i] == TDIR)
 		{
-			g_params.no[i] = (g_mem[pc+inc] << 24) + (g_mem[pc+inc+1] << 16) + (g_mem[pc+inc+2] << 8) + g_mem[pc+inc+3];
-			//memcpy(&g_env.regs[i], &g_mem[pc+inc], DIR_SIZE);
+			g_params.no[i] = (g_mem[pc+inc] << 24) 
+			| ((unsigned char)(g_mem[pc+inc+1]) << 16) | ((unsigned char)(g_mem[pc+inc+2]) << 8) | (unsigned char)g_mem[pc+inc+3];
 			inc += DIR_SIZE;
 		}
 		else if (g_params.type[i] == TIND)
 		{
-			g_params.no[i] = char2int(pc, inc);
+			g_params.no[i] = char2int(pc, inc, IND_SIZE);
 			inc += IND_SIZE;
 		}
 		else
