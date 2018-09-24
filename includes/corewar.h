@@ -33,6 +33,14 @@
 
 #define VMMEM(i) g_mem[i]
 
+typedef struct	s_vm
+{
+	int		dump_flag;
+	int		nchampions;
+	int		nprocesses;
+	char	vm_mem[MEM_SIZE];
+}				t_vm;
+
 /*
  * current operation of process, waiting for cooldown before being executed
 */
@@ -43,16 +51,6 @@ typedef struct	s_cur_op
 	int	cooldown;	// remaining cooldown
 }				t_cur_op;
 
-
-/*
- * represents a champion, champions are chained together in a list
- */
-typedef struct	s_process
-{
-	int					pid;
-	t_exec_env			exec_env;
-	struct s_process	*next;
-}				t_process;
 
 
 /*
@@ -83,14 +81,27 @@ typedef struct	s_op
 // later chain execution environments in a list
 // one environment per process
 // there can be arbitrarily many processes because they can fork themselves
-typedef struct	s_exec_env
+typedef struct	s_exec_env // execution environment of a process
 {
 	int			regno[REG_NUMBER];
 	int			pc;
 	int			carry;
-	char		is_alive;
+	int			is_alive;
 	t_cur_op	cur_op;
 }				t_exec_env;
+
+/*
+ * represents a champion, champions are chained together in a list
+ */
+typedef struct	s_process
+{
+	int					pid;
+	int					program_number;
+	char				name[PROG_NAME_LENGTH];
+	t_exec_env			exec_env;
+	struct s_process	*next;
+}				t_process;
+
 
 typedef struct	s_param
 {
@@ -115,7 +126,10 @@ void    vm_loop();
 /* vm.c */
 void	exec(int pc);
 
-
+/* load_champions.c */
+void	print_process_list(t_process *processes);
+void	load_champions(int ac, char **av, t_process **processes);
+void	init_vm();
 
 /* GLOBAL DATA */
 
@@ -127,6 +141,9 @@ t_exec_env	g_env;
 
 /* parameter types */
 t_param		g_params;
+
+/* represents VM */
+t_vm		g_vm;
 
 /* jump table of instructions */
 extern void (*g_ops[])(int);
