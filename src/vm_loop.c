@@ -103,7 +103,7 @@ void    clear_params()
     memset((void*)g_params.type, 0, sizeof(g_params.type));
 }
 
-void    vm_loop()
+void    vm_loop(t_process *processes)
 {
     int cycle_count;
     int cycle2die;
@@ -112,32 +112,29 @@ void    vm_loop()
     init_champion();
     cycle_count = 0;
     cycle2die = CYCLE_TO_DIE;
-    while(g_env.is_alive)
+    while(g_env.is_alive) // while (processes)
     {
-        g_env.is_alive = 0;
+        g_env.is_alive = 0; // set is_alive = 0 for all processes
         while (cycle_count < cycle2die)
         {
             cycle_count++;
-            g_env.cur_op.cooldown--;
-            if (g_env.cur_op.cooldown == 0)
+            g_env.cur_op.cooldown--; // decrement cooldown for all processes active ops
+            if (g_env.cur_op.cooldown == 0) // execute all ops with cooldown = 0 in correct order -> make execute(t_process *processes)
             {
-                // execute instruction and increment program counter
-                if (CUROP == 0)
-                {
-                    printf("CRASH\n");
-                    exit(1);
-                }
                 printf("-----------------------------------------------------------------------------\n");
                 exec(g_env.pc);
                 // get the next instruction
-                fetch_instruction();
+                fetch_instruction(); // fetch new instructions for all processes where cooldown = 0 
+                // set corrupted opcodes to -1, in order to prevent the PC from doing nonsense
                 // clear old parameters from global memory
-                clear_params();
+                clear_params(); // clear params for all processes where cooldown = 0
+
                 // reset cooldown to whatever next instruction requires
                 printf("-----------------------------------------------------------------------------\n");
             }
             usleep(100);   
         }
         cycle2die -= CYCLE_DELTA;
+        // kill all processes that didn't claim alive
     }
 }
