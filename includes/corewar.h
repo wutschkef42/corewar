@@ -37,7 +37,7 @@ typedef struct	s_vm
 {
 	int		dump_flag;
 	int		nchampions;
-	int		nprocesses;
+	int		nprocesses; // tells you the max pid when forking 
 	char	vm_mem[MEM_SIZE];
 }				t_vm;
 
@@ -46,32 +46,10 @@ typedef struct	s_vm
 */
 typedef struct	s_cur_op
 {
-	int	pid;		// to know which process the operation belongs to
 	int	opcode;
 	int	cooldown;	// remaining cooldown
 }				t_cur_op;
 
-// later chain execution environments in a list
-// one environment per process
-// there can be arbitrarily many processes because they can fork themselves
-typedef struct	s_exec_env
-{
-	int			regno[REG_NUMBER];
-	int			pc;
-	int			carry;
-	char		is_alive;
-	t_cur_op	cur_op;
-}				t_exec_env;
-
-
-/*
- * list of currently running operations (each process has an active operation that's waiting for cooldown)
- */
-typedef struct	s_op_queue
-{
-	t_cur_op			op;
-	struct s_op_queue	*next;
-}				t_op_queue;
 
 /*
  * describes one instruction of the VM's instruction set
@@ -110,6 +88,7 @@ typedef struct	s_process
 	int					program_number;
 	char				name[PROG_NAME_LENGTH];
 	t_exec_env			exec_env;
+	t_cur_op			cur_op;
 	struct s_process	*next;
 }				t_process;
 
