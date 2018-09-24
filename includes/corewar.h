@@ -51,6 +51,17 @@ typedef struct	s_cur_op
 	int	cooldown;	// remaining cooldown
 }				t_cur_op;
 
+// later chain execution environments in a list
+// one environment per process
+// there can be arbitrarily many processes because they can fork themselves
+typedef struct	s_exec_env
+{
+	int			regno[REG_NUMBER];
+	int			pc;
+	int			carry;
+	char		is_alive;
+	t_cur_op	cur_op;
+}				t_exec_env;
 
 
 /*
@@ -125,6 +136,7 @@ void    vm_loop();
 
 /* vm.c */
 void	exec(int pc);
+int		char2int(int pc, int inc, int size);
 
 /* load_champions.c */
 void	print_process_list(t_process *processes);

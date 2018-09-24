@@ -32,16 +32,16 @@ void	live(int pc)
 //int	ld(int pc)
 void	ld(int pc)
 {	
-	if (TPARAM(1) != TREG || ((PARAM(1) == 0) && PARAM(1) == TIND))//takes 2 parameters, the 2nd of which has to be a register (not the PC) 
+	if (TPARAM(1) != TREG)//takes 2 parameters, the 2nd of which has to be a register (not the PC) 
 	{
-		fprintf(stderr, "wrong parameters type in instruction sub");
+		fprintf(stderr, "wrong parameters type in instruction load");
 		CARRY = 0;
 		return ;
 	}
 	printf("load()\n");
 	if (TPARAM(0) == TIND)
 	{
-		REGNO(PARAM(1)) = VMMEM(pc + PARAM(0));
+		REGNO(PARAM(1)) = char2int(pc, PARAM(0), REG_SIZE);//; VMMEM(pc + PARAM(0));
 	}
 	else if (TPARAM(0) == TDIR)
 	{
@@ -71,10 +71,10 @@ void	st(int pc)
 	if (g_params.type[1] == TREG) // here store in register
 	{
 		REGNO(PARAM(1)) = REGNO(PARAM(0));
-		//g_env.regno[g_params.no[1]] = g_env.regno[g_params.no[0]];
 	}
 	else // here store in VM memory
 	{
+		int2char();
 		VMMEM(pc + PARAM(1)) = REGNO(PARAM(0));
 		printf("st(): param0: %d, param1: %d, reg%d: %d\n", PARAM(0), PARAM(1), PARAM(0), REGNO(PARAM(0)));
 	}
@@ -92,7 +92,7 @@ void	st(int pc)
 void	add(int pc)
 {
 	printf("add() : adding r%d(%d) and r%d(%d)", PARAM(0), REGNO(PARAM(0)), PARAM(1), REGNO(PARAM(1)));
-	if (TPARAM(0) == TREG && TPARAM(1) == TREG && PARAM(2) == TREG)
+	if (TPARAM(0) == TREG && TPARAM(1) == TREG && TPARAM(2) == TREG)
 	{
 		REGNO(PARAM(2)) = REGNO(PARAM(0)) + REGNO((PARAM(1)));
 		CARRY = 1;
@@ -115,7 +115,7 @@ void	add(int pc)
 void	sub(int pc)
 {
 		printf("sub() : soustracting r%d(%d) and r%d(%d)", PARAM(0), REGNO(PARAM(0)), PARAM(1), REGNO(PARAM(1)));
-	if (TPARAM(0) == TREG && TPARAM(1) == TREG && PARAM(2) == TREG)
+	if (TPARAM(0) == TREG && TPARAM(1) == TREG && TPARAM(2) == TREG)
 	{
 		REGNO(PARAM(2)) = REGNO(PARAM(0)) - REGNO((PARAM(1)));
 		CARRY = 1;
