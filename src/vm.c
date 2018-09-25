@@ -3,7 +3,8 @@
 
 
 
-void (*g_ops[])(int) = {0, live, ld, st, add, sub, and, or, xor};
+void (*g_ops[])(t_process **processes, t_process *active_process) = {0, live, ld, st, add, sub, and, or, xor};
+
 
 /* read op_code from memory and store it in execution environment */
 void	get_op_code(int pc)
@@ -17,7 +18,7 @@ void	get_op_code(int pc)
  *		register parameters are encoded by	01
  *		direct parameters are encoded by	10
  *		indirect parameters are encoded by	11
-*/
+
 void	get_formatting(int pc)
 {
 	char	enc_byte;
@@ -30,6 +31,7 @@ void	get_formatting(int pc)
 	g_params.type[2] = (enc_byte >> 2) & 0x3;
 	printf("%02X %02X %02X\n", g_params.type[0], g_params.type[1], g_params.type[2]);		
 }
+*/
 
 /* 
 * convert an integer into between 1 and 4 chars
@@ -80,7 +82,7 @@ int		char2int(int pc, int inc, int size)
 
 /* store parameters in registers execution environment 
  * WARNING WE ASSUME 4 BYTE REGISTERS -> Generalize later!
-*/
+
 void	get_params(int pc)
 {
 	int	i;
@@ -113,8 +115,9 @@ void	get_params(int pc)
 	}
 	printf("get_params(): param1: %d, param2: %d, param3: %d\n", g_params.no[0], g_params.no[1], g_params.no[2]);
 }
+*/
 
-/* fills execution environment (registers and op-code)  */
+/* fills execution environment (registers and op-code)  
 int	decode(int pc)
 {
 	int inc;
@@ -126,16 +129,17 @@ int	decode(int pc)
 	return (inc);
 }
 
+*/
 
-
-/* runs op_code on data stored in registers */
+/* runs op_code on data stored in registers 
 void	exec(int pc)
 {
 	decode(pc);
 	g_ops[CUROP](pc);
 }
+*/
 
-/* load binary into VM memory */
+/* load binary into VM memory 
 void	load_binary(char *av)
 {
 	int	fd;
@@ -150,6 +154,7 @@ void	load_binary(char *av)
 	while ((n_read = read(fd, &c, 1)))
 		g_mem[i++] = (char)c;
 }
+*/
 
 /* print hexdump of VM's memory */
 void	print_hexdump()
@@ -169,14 +174,3 @@ void	print_hexdump()
 	}
 }
 
-int	main(int ac, char **av)
-{
-	if (ac != 2)
-		exit(0);
-	load_binary(av[1]);
-	print_hexdump();
-	//exec(0);
-	vm_loop();
-	print_hexdump();
-	return 0;
-}

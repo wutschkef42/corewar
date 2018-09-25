@@ -5,7 +5,6 @@
 int		main(int ac, char **av)
 {
 	t_process	*processes;
-	t_op_queue	*op_queue;
 
 	processes = NULL;
 	op_queue = NULL;
@@ -16,4 +15,16 @@ int		main(int ac, char **av)
 	// now start vm loop
 	vm_loop(processses);
 	return (0);
+}
+
+int	main(int ac, char **av)
+{
+	if (ac != 2)
+		exit(0);
+	load_binary(av[1]);
+	print_hexdump();
+	//exec(0);
+	vm_loop();
+	print_hexdump();
+	return 0;
 }

@@ -27,7 +27,7 @@
 
 #define CARRY		g_env.carry
 #define REGNO(i)	g_env.regno[i]
-#define CUROP 		g_env.cur_op.opcode
+#define CUROP(pc) 	g_mem[pc] //g_env.cur_op.opcode
 
 #define PARAM(i) g_params.no[i]
 #define TPARAM(i) g_params.type[i]
