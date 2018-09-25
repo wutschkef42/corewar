@@ -1,4 +1,4 @@
-.name "zork"
+.name "w455"
 .comment "just a basic living prog"
 		
 	ld	%-112,r1 

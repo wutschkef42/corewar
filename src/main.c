@@ -1,4 +1,6 @@
 
+
+#include "libft.h"
 #include "corewar.h"
 
 
@@ -14,5 +16,6 @@ int		main(int ac, char **av)
 	// now start vm loop
 	vm_loop(&processes);
 	print_hexdump();
+	print_vm_state();
 	return (0);
 }

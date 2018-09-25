@@ -10,6 +10,7 @@
 #include <string.h>
 
 #define HEADER_SIZE 0x890
+#define NAME_OFFSET 4
 
 #define TREG 1
 #define TDIR 2
@@ -44,7 +45,8 @@ typedef struct	s_vm
 {
 	int		dump_flag;
 	int		nchampions;
-	int		nprocesses; // tells you the max pid when forking 
+	int		max_pid; // highest pid in use, needed to give new pids
+	int		current_winner; // player number with the latest valid live instruction
 	char	vm_mem[MEM_SIZE];
 }				t_vm;
 
@@ -168,6 +170,7 @@ void	init_cur_ops(t_process *processes);
 
 /* util.c */
 void	print_hexdump();
+void	print_vm_state();
 
 /* GLOBAL DATA */
 

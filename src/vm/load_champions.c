@@ -4,10 +4,20 @@
 #include "corewar.h"
 
 
+/* get program name from program header and store it in t_process for later use */
+static void	store_progam_name(int fd, t_process *champion)
+{
+	char	name_buffer[PROG_NAME_LENGTH];
+
+	lseek(fd, NAME_OFFSET, SEEK_SET); // set to first byte of name
+	if (read(fd, name_buffer, PROG_NAME_LENGTH) < 0)
+		return ;
+	ft_memccpy(champion->name, name_buffer, 0, PROG_NAME_LENGTH);
+}
 
 
 /* load binary into VM memory */
-static void	load_binary(char *av, int mem_address)
+static void	load_binary(char *av, int mem_address, t_process *champion)
 {
 	int	fd;
 	int nread;
@@ -19,8 +29,14 @@ static void	load_binary(char *av, int mem_address)
 	total_read = 0;
 	i = mem_address;
 	nread = 0;
-	fd = open(av , O_RDONLY);
+	if ((fd = open(av , O_RDONLY)) < 0)
+	{
+		ft_printf("cannot find binary to load..\n");
+		exit(1);
+	}
+	store_progam_name(fd, champion);
 	lseek(fd, HEADER_SIZE, SEEK_SET);
+	ft_printf("prog_name: %s\n", champion->name);
 	while ((nread = read(fd, &c, 1)))
 	{
 		total_read += nread;
@@ -53,7 +69,7 @@ static void	load_champion(int *nchampion, int *cur_arg, char **av, t_process **p
 	champion->exec_env.pc = MEM_SIZE * (*nchampion - 1) / g_vm.nchampions;
 	champion->exec_env.is_alive = 1;
 	ft_printf("pc = %d\n", champion->exec_env.pc);
-	load_binary(av[*cur_arg], champion->exec_env.pc);
+	load_binary(av[*cur_arg], champion->exec_env.pc, champion);
 	add_to_process_list(processes, champion);
 	g_vm.nprocesses += 1;
 	*cur_arg += 1;
@@ -96,6 +112,7 @@ void	load_champions(int ac, char **av, t_process **processes)
 		g_vm.dump_flag = (ft_atoi(av[cur_arg]) >= 0) ? ft_atoi(av[cur_arg]) : -1;
 		cur_arg++;
 	}
+	// parse optional -n flags and store program numbers in champions' process struct
 	if (ac - cur_arg > MAX_PLAYERS)
 	{
 		ft_printf("Too many champions\n");

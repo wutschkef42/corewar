@@ -92,7 +92,13 @@ void    vm_loop(t_process **processes)
         cycle_count = 0;
         while (cycle_count < cycle_to_die)
         {
+            if (g_vm.dump_flag == 0)
+            {
+                print_hexdump();
+                exit(0);
+            }
             cycle_count++;
+            g_vm.dump_flag = (g_vm.dump_flag == -1) ? -1 : g_vm.dump_flag - 1;
             decrement_cooldown(*processes);
             execute_cooled_down_instructions(processes);
             fetch_new_cur_ops(*processes);

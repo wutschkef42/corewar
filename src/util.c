@@ -2,6 +2,13 @@
 #include "libft.h"
 #include "corewar.h"
 
+
+void	print_vm_state()
+{
+	ft_printf("\ndump_flag: %d\n", g_vm.dump_flag);
+}
+
+
 void	print_usage()
 {
 	ft_printf("usage..\n");
