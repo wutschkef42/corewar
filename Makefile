@@ -8,9 +8,17 @@ LIB_DIR		= ./lib
 
 
 
-SRC			= vm.c \
+SRC			= main.c \
+			  util.c \
+			  conversion.c \
+			  execution.c \
+			  fetch_instructions.c \
+			  decode_params.c \
+			  vm.c \
 			  vm_loop.c \
-			  ops.c 
+			  ops.c \
+			  vm/fetch_cur_ops.c \
+			  vm/load_champions.c
 
 OBJ			= $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 

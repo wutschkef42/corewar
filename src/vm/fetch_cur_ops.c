@@ -11,7 +11,7 @@ void	init_cur_ops(t_process *processes)
 {
 	while (processes)
 	{
-		processes->cur_op.opcode = g_mem[processes->exec_env.pid];
+		processes->cur_op.opcode = g_vm.vm_mem[processes->exec_env.pid];
 		processes->cooldown = op_tab[processes->cur_op.opcode].cooldown;
 		processes = processes->next;
 	}

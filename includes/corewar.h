@@ -32,7 +32,7 @@
 #define PARAM(i) g_params.no[i]
 #define TPARAM(i) g_params.type[i]
 
-#define VMMEM(i) g_mem[i]
+#define VMMEM(i) g_vm.vm_mem[i]
 
 typedef struct	s_vm
 {
@@ -121,12 +121,18 @@ void	or(int pc);
 void	xor(int pc);
 void	zjump(int pc);
 
+/* util.c */
+void	print_usage();
+
 /* vm_loop.c */
 void    vm_loop();
 
 /* vm.c */
-void	exec(int pc);
+//void	exec(int pc);
+//void    exec(t_process **processes, t_process *active_process);
 int		char2int(int pc, int inc, int size);
+void	int2char(int pc, int inc, int size, int regno);
+
 
 /* load_champions.c */
 void	print_process_list(t_process *processes);
@@ -134,10 +140,23 @@ void	load_champions(int ac, char **av, t_process **processes);
 void	add_to_process_list(t_process **processes, t_process *champion);
 void	init_vm();
 
+/* process_list_api.c */
+void    remove_dead_processes(t_process **processes);
+
+/* execution.c */
+void    execute_cooled_down_instructions(t_process **processes);
+
+/* fetch_instructions.c */
+void    fetch_new_cur_ops(t_process *processes);
+
+/* decode_params.c */
+void    decode(t_process *active_process);
+
+
 /* GLOBAL DATA */
 
 /* representes VM memory */
-char		g_mem[MEM_SIZE];
+//char		g_mem[MEM_SIZE];
 
 /* execution environment*/
 t_exec_env	g_env;
@@ -149,7 +168,7 @@ t_param		g_params;
 t_vm		g_vm;
 
 /* jump table of instructions */
-extern void (*g_ops[])(int);
+extern void (*g_ops[])(t_process **processes, t_process *active_process);
 
 
 

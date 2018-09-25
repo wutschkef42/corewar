@@ -3,22 +3,11 @@
 #include "libft.h"
 #include "corewar.h"
 
-void	print_usage()
-{
-	ft_printf("usage..\n");
-	exit(1);
-}
 
-void	init_vm()
-{
-	g_vm.dump_flag = -1;
-	g_vm.nchampions = 0;
-	g_vm.nprocesses = 0;
-}
 
 
 /* load binary into VM memory */
-void	load_binary(char *av, int mem_address)
+static void	load_binary(char *av, int mem_address)
 {
 	int	fd;
 	int nread;
@@ -35,7 +24,7 @@ void	load_binary(char *av, int mem_address)
 	while ((nread = read(fd, &c, 1)))
 	{
 		total_read += nread;
-		g_mem[i++] = (char)c;
+		g_vm.vm_mem[i++] = (char)c;
 		if (total_read > CHAMP_MAX_SIZE)
 		{
 			ft_printf("champion too big...\n");
@@ -44,29 +33,12 @@ void	load_binary(char *av, int mem_address)
 	}
 }
 
-void	add_to_process_list(t_process **processes, t_process *champion)
-{
-	champion->next = *processes;
-	*processes = champion;
-}
-
-void	print_process_list(t_process *processes)
-{
-	t_process *p;
-
-	p = processes;
-	while (p)
-	{
-		ft_printf("pid: %d, pc: %d, carry: %d, is_alive: %d\n", p->pid, p->exec_env.pc, p->exec_env.carry, p->exec_env.is_alive);
-		p = p->next;
-	}
-}
 
 /*
 ** calculate memory address
 **  
 */
-void	load_champion(int *nchampion, int *cur_arg, char **av, t_process **processes)
+static void	load_champion(int *nchampion, int *cur_arg, char **av, t_process **processes)
 {
 	ft_printf("load champion\n");
 	t_process	*champion;
@@ -92,7 +64,7 @@ void	load_champion(int *nchampion, int *cur_arg, char **av, t_process **processe
 /*
 ** calculate number of champions to be loaded
 */
-void	calc_nchampions(int ac, char **av)
+static void	calc_nchampions(int ac, char **av)
 {
 	int	nchampions;
 	int	cur_arg;
