@@ -84,9 +84,12 @@ void    vm_loop(t_process **processes)
     int cycle_count;
     int cycle_to_die;
 
-    while (processes)
+    init_cur_ops(*processes);
+    cycle_to_die = CYCLE_TO_DIE;
+    while (*processes)
     {
         set_is_alive_zero(*processes);
+        cycle_count = 0;
         while (cycle_count < cycle_to_die)
         {
             cycle_count++;

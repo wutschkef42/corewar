@@ -12,6 +12,7 @@ int		main(int ac, char **av)
 	print_process_list(processes);
 	//init_op_queue(processes, &op_queue); // obsolete, cur_op now lives inside list of processes
 	// now start vm loop
-	vm_loop(processes);
+	vm_loop(&processes);
+	print_hexdump();
 	return (0);
 }

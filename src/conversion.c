@@ -7,7 +7,7 @@
 * convert an integer into between 1 and 4 chars
 */
 
-void	int2char(int pc, int inc, int size, int regno)
+void	int2char(t_process *active_process, int pc, int inc, int size, int regno)
 {
 	int i;
 

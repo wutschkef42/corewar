@@ -137,7 +137,7 @@ void    vm_loop();
 //void	exec(int pc);
 //void    exec(t_process **processes, t_process *active_process);
 int		char2int(int pc, int inc, int size);
-void	int2char(int pc, int inc, int size, int regno);
+void	int2char(t_process *active_process, int pc, int inc, int size, int regno);
 
 
 /* load_champions.c */
@@ -158,6 +158,16 @@ void    fetch_new_cur_ops(t_process *processes);
 /* decode_params.c */
 void    decode(t_process *active_process);
 
+/* process_list_api.c */
+void	add_to_process_list(t_process **processes, t_process *champion);
+void	print_process_list(t_process *processes);
+void    remove_dead_processes(t_process **processes);
+
+/* fetch_cur_ops.c */
+void	init_cur_ops(t_process *processes);
+
+/* util.c */
+void	print_hexdump();
 
 /* GLOBAL DATA */
 
@@ -175,7 +185,7 @@ t_vm		g_vm;
 
 /* jump table of instructions */
 extern void (*g_ops[])(t_process **processes, t_process *active_process);
-
+extern t_op    op_tab[17];
 
 
 

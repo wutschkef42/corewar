@@ -7,11 +7,12 @@ static void    get_formatting(t_process *active_process)
 {
     char    enc_byte;
 
-    
+enc_byte = g_vm.vm_mem[CURPC+1];
+    printf("enc_byte = %hhX\n", enc_byte);
     active_process->cur_op.params.type[0] = (enc_byte >> 6) & 0x3;
     active_process->cur_op.params.type[1] = (enc_byte >> 4) & 0x3;
     active_process->cur_op.params.type[2] = (enc_byte >> 2) & 0x3;
-    printf("%02X %02X %02X\n", active_process->cur_op.params.type[0], active_process->cur_op.params.type[1], active_process->cur_op.params.type[2]);
+    printf("get_formatting(): %02X %02X %02X\n", active_process->cur_op.params.type[0], active_process->cur_op.params.type[1], active_process->cur_op.params.type[2]);
 
 }
 

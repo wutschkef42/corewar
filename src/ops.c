@@ -12,9 +12,9 @@ void	live(t_process **processes, t_process *active_process)
 {
 	unsigned int	n;
 
-	//printf("byte1: %hhX, byte2: %hhX, byte3: %hhX, byte4: %hhX\n", VMMEM(CURPC + 1), VMMEM(CURPC + 2), VMMEM(CURPC + 3), VMMEM(CURPC + 4));
-	n = (VMMEM(CURPC + 1) << 24) | ((unsigned char)(VMMEM(CURPC +2)) << 16) | ((unsigned char)(VMMEM(CURPC + 3)) << 8) | (unsigned char)VMMEM(CURPC + 4);	
-	//printf("I'm alive %d(player_name)\n", n);
+	printf("byte1: %hhX, byte2: %hhX, byte3: %hhX, byte4: %hhX\n", VMMEM(CURPC + 1), VMMEM(CURPC + 2), VMMEM(CURPC + 3), VMMEM(CURPC + 4));
+	n = (VMMEM(CURPC + 1) << 24) | ((unsigned char)(VMMEM(CURPC +2)) << 16) | ((unsigned char)(VMMEM(CURPC + 3)) << 8) | (unsigned char)VMMEM(CURPC + 4);
+	printf("I'm alive %d(player_name)\n", n);
 	ISALIVE = 1;
 }
 
@@ -31,13 +31,13 @@ void	live(t_process **processes, t_process *active_process)
 //int	ld(t_process **processes, t_process *active_process)
 void	ld(t_process **processes, t_process *active_process)
 {	
+	printf("load()\n");
 	if (TPARAM(1) != TREG)//takes 2 parameters, the 2nd of which has to be a register (not the PC) 
 	{
 		//fprintf(stderr, "wrong parameters type in instruction load");
 		CARRY = 0;
 		return ;
 	}
-	//printf("load()\n");
 	if (TPARAM(0) == TIND)
 	{
 		REGNO(PARAM(1)) = char2int(CURPC, (PARAM(0) % IDX_MOD), REG_SIZE);
@@ -62,7 +62,7 @@ void	st(t_process **processes, t_process *active_process)
 {
 	if (TPARAM(0) != TREG)
 	{
-		printf(stderr, "wrong parameters type in instruction sub");
+		//printf(stderr, "wrong parameters type in instruction sub");
 		CARRY = 0;
 		return ;
 	}
@@ -73,7 +73,7 @@ void	st(t_process **processes, t_process *active_process)
 	}
 	else // here store in VM memory
 	{
-		int2char(CURPC, 0, REG_SIZE, PARAM(0));
+		int2char(active_process, CURPC, 0, REG_SIZE, PARAM(0));
 		//VMMEM((CURPC + PARAM(1) % IDX_MOD) % MEM_SIZE) = REGNO(PARAM(0));
 		printf("st(): param0: %d, param1: %d, reg%d: %d\n", PARAM(0), PARAM(1), PARAM(0), REGNO(PARAM(0)));
 	}
