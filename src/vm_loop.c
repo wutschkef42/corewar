@@ -41,68 +41,9 @@ void    init_champion()
     g_env.cur_op.cooldown = op_tab[g_mem[g_env.pc]].cooldown;
 }
 
-/* calculates how many bytes the params take up */
-int     size_of_params()
-{
-    int size;
-    int i;
 
-    size = 0;
-    i = 0;
-    while (i < MAX_ARGS_NUMBER)
-    {
-        if (TPARAM(i) == TREG)
-            size += 1;
-        else if (TPARAM(i) == TDIR)
-            size += DIR_SIZE;
-        else if (TPARAM(i) == TIND)
-            size += IND_SIZE;
-        i++;
-    }
-    return (size);
-}
-
-/* calculates how many bytes the current instruction and its parameters take up */
-int     calc_instruction_size()
-{
-    if (CUROP == LIVE) // 1byte for opcode, 4 bytes for param, no encoding byte
-        return (5);
-    else if (CUROP == LOAD || CUROP == STORE || CUROP == ADD || CUROP == SUB
-    || CUROP == AND || CUROP == OR || CUROP == XOR) // 1byte for opcode, 1byte for encoding, + some bytes for params
-    {
-        return (2 + size_of_params());
-    }
-    return (-1); // ERROR
-}
 
 /*
- * increments pc
- * sets cooldown
- * sets opcode
-*/
-void    fetch_instruction()
-{
-    g_env.pc += calc_instruction_size();   
-    CUROP = VMMEM(g_env.pc);
-    g_env.cur_op.cooldown = op_tab[CUROP].cooldown;
-}
-
-/* turn the process alive */
-void    start_process()
-{
-    g_env.is_alive = 1;
-}
-
-/* clear old parameters from parameter memory
- * necessary because for example old instruction had 3 params,
- * new instruction has only 2, so the 3rd one won't be fully overwritten by the new ones
-*/
-void    clear_params()
-{
-    memset((void*)g_params.no, 0, sizeof(g_params.no));
-    memset((void*)g_params.type, 0, sizeof(g_params.type));
-}
-
 void    vm_loop(t_process *processes)
 {
     int cycle_count;
@@ -136,5 +77,223 @@ void    vm_loop(t_process *processes)
         }
         cycle2die -= CYCLE_DELTA;
         // kill all processes that didn't claim alive
+    }
+}
+*/
+
+
+/*
+ * set the is_alive flag of each process to 0
+*/
+void    set_is_alive_zero(t_process *processes)
+{
+    while (processes)
+    {
+        processes->exec_env.is_alive = 0;
+        processes = processes->next;
+    }
+}
+
+/*
+ * decrement the cooldown of each processes' current operation by one
+*/
+void    decrement_cooldown(t_process *processes)
+{
+    while (processes)
+    {
+        processes->cur_op.cooldown--;
+        processes = processes->next;
+    }
+}
+
+
+void    get_formatting(t_process *active_process)
+{
+    char    enc_byte;
+
+    
+    active_process->cur_op.params.type[0] = (enc_byte >> 6) & 0x3;
+    active_process->cur_op.params.type[1] = (enc_byte >> 4) & 0x3;
+    active_process->cur_op.params.type[2] = (enc_byte >> 2) & 0x3;
+    printf("%02X %02X %02X\n", active_process->cur_op.params.type[0], active_process->cur_op.params.type[1], active_process->cur_op.params.type[2]);
+
+}
+
+void    get_params(t_process *active_process)
+{
+    int i;
+    int inc;
+
+    inc = 2; // first byte of first parameter
+    i = 0;
+    while (active_process->cur_op.params.type[i] != 0)
+    {
+        printf("g_params.type[%d] = %d\n", i, active_process->cur_op.params.type[i]);
+        if (active_process->cur_op.params.type[i] == TREG)
+        {
+            active_process->cur_op.params.no[i] = g_mem[pc+inc];
+            inc += 1;
+        }
+        else if (active_process->cur_op.params.type[i] == TDIR)
+        {
+            active_process->cur_op.params.no[i] = (g_mem[pc+inc] << 24) 
+            | ((unsigned char)(g_mem[pc+inc+1]) << 16) | ((unsigned char)(g_mem[pc+inc+2]) << 8) | (unsigned char)g_mem[pc+inc+3];
+            inc += DIR_SIZE;
+        }
+        else if (active_process->cur_op.params.type[i] == TIND)
+        {
+            active_process->cur_op.params.no[i] = char2int(pc, inc, IND_SIZE);
+            inc += IND_SIZE;
+        }
+        else
+            break ;
+        i++;
+    }
+    printf("get_params(): param1: %d, param2: %d, param3: %d\n", active_process->cur_op.params.no[0], active_process->cur_op.params.no[1], active_process->cur_op.params.type[2]);
+}
+
+void    decode(t_process *active_process)
+{
+    get_formatting(active_process);
+    get_params(active_process);
+}
+
+/* gets list of processes to be able to append new processes after fork
+ * and the active_process to be executed
+*/
+void    exec(t_process **processes, t_process *active_process)
+{
+    decode(active_process);
+    g_ops[active_process->cur_op.opcode](processes, active_process);
+}
+
+
+
+
+/* calculates how many bytes the params take up */
+int     size_of_params(t_cur_op op)
+{
+    int size;
+    int i;
+
+    size = 0;
+    i = 0;
+    while (i < MAX_ARGS_NUMBER)
+    {
+        if (op.params.type[i] == TREG)
+            size += 1;
+        else if (op.params.type[i] == TDIR)
+            size += DIR_SIZE;
+        else if (op.params.type[i] == TIND)
+            size += IND_SIZE;
+        i++;
+    }
+    return (size);
+}
+
+
+
+/* calculates how many bytes the current instruction and its parameters take up */
+int     calc_instruction_size(t_cur_op op)
+{
+    if (op.opcode == LIVE) // 1byte for opcode, 4 bytes for param, no encoding byte
+        return (5);
+    else if (op.opcode == LOAD || op.opcode == STORE || op.opcode == ADD || op.opcode == SUB
+    || op.opcode == AND || op.opcode == OR || op.opcode == XOR) // 1byte for opcode, 1byte for encoding, + some bytes for params
+    {
+        return (2 + size_of_params(op));
+    }
+    return (-1); // ERROR
+}
+
+/*
+ * fetch new instructions for all processes whose cur_op has been executed on the last cycle
+ *
+ * increments pc
+ * sets cooldown
+ * sets opcode
+*/
+void    fetch_new_cur_ops(t_process *processes)
+{
+    while (processes)
+    {
+        if (processes->cur_op.cooldown == 0)
+        {
+            processes->exec_env.pc += calc_instruction_size(processes->cur_op);
+            processes->cur_op.opcode = VMMEM(processes->exec_env.pc);
+            processes->cur_op.cooldown = op_tab[processes->cur_op.opcode].cooldown; // !!! POTENTIAL BUS ERROR
+            memset((void*)processes->cur_op.params.no, 0, sizeof(processes->cur_op.params.no)); // reset cooled down params
+            memset((void*)processes->cur_op.params.type, 0, sizeof(processes->cur_op.params.type)); // reset cooled down params
+        }
+        processes = processes->next;
+    }
+}
+
+
+void    execute_cooled_down_instructions(t_process **processes)
+{
+    t_processes *p;
+
+    p = *processes;
+    while (p)
+    {
+        if (p->cur_op.cooldown == 0)
+            exec(processes, p);
+        p = p->next;
+    }
+}
+
+void    remove_process(t_process **processes, t_process *to_kill)
+{
+    t_process   *p;
+
+    if (*processes = to_kill)
+    {
+        *processes = (*processes)->next;
+        free(to_kill);
+    }
+    p = *processes;
+    while (p)
+    {
+        if (p->next == to_kill)
+        {
+            p->next = p->next-next;
+            free(to_kill);
+        }
+        p = p->next;
+    }
+}
+
+void    remove_dead_processes(t_process **processes)
+{
+    t_process   *p;
+
+    p = *processes;
+    while (p)
+    {
+        if (p->exec_env.is_alive == 0)
+            remove_process(processes, p);
+        p = p->next;
+    }
+}
+
+void    vm_loop(t_process **processes)
+{
+    int cycle_count;
+    int cycle_to_die;
+
+    while (processes)
+    {
+        set_is_alive_zero(*processes);
+        while (cycle_count < cycle_to_die)
+        {
+            cycle_count++;
+            decrement_cooldown(*processes);
+            execute_cooled_down_instructions(processes);
+            fetch_new_cur_ops(*processes);
+            usleep(100);
+        }
+        cycle_to_die -= CYCLE_DELTA;
+        remove_dead_processes(processes);
     }
 }
