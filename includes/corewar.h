@@ -25,14 +25,17 @@
 #define XOR		8
 #define ZJUMP	9
 
-#define CARRY		g_env.carry
-#define REGNO(i)	g_env.regno[i]
-#define CUROP(pc) 	g_mem[pc] //g_env.cur_op.opcode
 
-#define PARAM(i) g_params.no[i]
-#define TPARAM(i) g_params.type[i]
+#define REGNO(i)	active_process->exec_env.regno[i]
+#define PARAM(i) 	active_process->cur_op.params.no[i]
+#define TPARAM(i) 	active_process->cur_op.params.type[i]
 
-#define VMMEM(i) g_mem[i]
+#define CURPC		active_process->exec_env.pc
+#define CARRY		active_process->exec_env.carry
+#define ISALIVE		active_process->exec_env.is_alive
+
+#define VMMEM(i) 	g_vm.vm_mem[i]
+//#define CUROP(pc) 	g_vm.vm_mem[pc] //g_env.cur_op.opcode
 
 typedef struct	s_vm
 {
@@ -111,15 +114,15 @@ typedef struct	s_process
 
 
 /* instructions */
-void	live(int pc);
-void	ld(int pc);
-void	st(int pc);
-void	add(int pc);
-void	sub(int pc);
-void	and(int pc);
-void	or(int pc);
-void	xor(int pc);
-void	zjump(int pc);
+void	live(t_process **processes, t_process *active_process);
+void	ld(t_process **processes, t_process *active_process);
+void	st(t_process **processes, t_process *active_process);
+void	add(t_process **processes, t_process *active_process);
+void	sub(t_process **processes, t_process *active_process);
+void	and(t_process **processes, t_process *active_process);
+void	or(t_process **processes, t_process *active_process);
+void	xor(t_process **processes, t_process *active_process);
+void	zjump(t_process **processes, t_process *active_process);
 
 /* vm_loop.c */
 void    vm_loop();
@@ -127,6 +130,7 @@ void    vm_loop();
 /* vm.c */
 void	exec(int pc);
 int		char2int(int pc, int inc, int size);
+void	int2char(int pc, int inc, int size, int regno);
 
 /* load_champions.c */
 void	print_process_list(t_process *processes);
