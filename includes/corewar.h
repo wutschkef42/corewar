@@ -22,7 +22,8 @@
 #define AND		5
 #define SUB 	6 
 #define OR 		7 
-#define XOR		8 
+#define XOR		8
+#define ZJUMP	9
 
 #define CARRY		g_env.carry
 #define REGNO(i)	g_env.regno[i]
@@ -118,6 +119,7 @@ void	sub(int pc);
 void	and(int pc);
 void	or(int pc);
 void	xor(int pc);
+void	zjump(int pc);
 
 /* vm_loop.c */
 void    vm_loop();
