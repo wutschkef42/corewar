@@ -7,41 +7,40 @@
  * sets the is_alive flag in processes global memory
  * CAN IT GO WRONG? DONT THINK SO
 */
-//int	live(int pc)
-void	live(int pc)
+//int	live(t_process **processes, t_process *active_process)
+void	live(t_process **processes, t_process *active_process)
 {
 	unsigned int	n;
 
-	printf("byte1: %hhX, byte2: %hhX, byte3: %hhX, byte4: %hhX\n", VMMEM(pc+1), VMMEM(pc+2), VMMEM(pc+3), VMMEM(pc+4));
-	n = (g_mem[pc+1] << 24) | ((unsigned char)(g_mem[pc+2]) << 16) | ((unsigned char)(g_mem[pc+3]) << 8) | (unsigned char)g_mem[pc+4];	
-	printf("I'm alive %d(player_name)\n", n);
-	g_env.is_alive = 1;
-	(void)pc;
+	//printf("byte1: %hhX, byte2: %hhX, byte3: %hhX, byte4: %hhX\n", VMMEM(CURPC + 1), VMMEM(CURPC + 2), VMMEM(CURPC + 3), VMMEM(CURPC + 4));
+	n = (VMMEM(CURPC + 1) << 24) | ((unsigned char)(VMMEM(CURPC +2)) << 16) | ((unsigned char)(VMMEM(CURPC + 3)) << 8) | (unsigned char)VMMEM(CURPC + 4);	
+	//printf("I'm alive %d(player_name)\n", n);
+	ISALIVE = 1;
 }
 
 /*								load(0x02)
  * NOTE ld affects carry, not implemented yet // DONE
  * two cases:
  *  1. 34%,r3 -> load 34 to r3
- *  2. 34,r3  -> load value from mem address (pc + 34) to r3
+ *  2. 34,r3  -> load value from mem address (CURPC + 34) to r3
  * This instruction takes 2 parameters, the 2nd of which has to be a register (not the PC) 
  * It loads the value of the first parameter in the register. 
  * This operation modifies the carry. 
  * ld 34,r3 loads the REG_SIZE bytes from address (PC + (34 % IDX_MOD)) in register r3.
 */
-//int	ld(int pc)
-void	ld(int pc)
+//int	ld(t_process **processes, t_process *active_process)
+void	ld(t_process **processes, t_process *active_process)
 {	
 	if (TPARAM(1) != TREG)//takes 2 parameters, the 2nd of which has to be a register (not the PC) 
 	{
-		fprintf(stderr, "wrong parameters type in instruction load");
+		//fprintf(stderr, "wrong parameters type in instruction load");
 		CARRY = 0;
 		return ;
 	}
-	printf("load()\n");
+	//printf("load()\n");
 	if (TPARAM(0) == TIND)
 	{
-		REGNO(PARAM(1)) = char2int(pc, (PARAM(0) % IDX_MOD), REG_SIZE);
+		REGNO(PARAM(1)) = char2int(CURPC, (PARAM(0) % IDX_MOD), REG_SIZE);
 	}
 	else if (TPARAM(0) == TDIR)
 	{
@@ -54,28 +53,28 @@ void	ld(int pc)
  * WARNING no input validation
  * two cases:
  *	1. r1,r2 -> store value from env.r1 in r2
- *	2. r1,34 -> store value from env.r1 in mem address (pc + 34)
+ *	2. r1,34 -> store value from env.r1 in mem address (CURPC + 34)
  * This instruction takes 2 parameters. 
  * It stores (REG_SIZE bytes) the value of the first argument (always a register) in the second. 
  * st r4,34 stores the value of r4 at the address (PC + (34 % IDX_MOD)) st r3,r8 copies r3 in r8
 */
-void	st(int pc)
+void	st(t_process **processes, t_process *active_process)
 {
 	if (TPARAM(0) != TREG)
 	{
-		fprintf(stderr, "wrong parameters type in instruction sub");
+		printf(stderr, "wrong parameters type in instruction sub");
 		CARRY = 0;
 		return ;
 	}
-	printf("store(), cooldown: %d\n", g_env.cur_op.cooldown);
-	if (g_params.type[1] == TREG) // here store in register
+	printf("store()");
+	if (TPARAM(1) == TREG) // here store in register
 	{
 		REGNO(PARAM(1)) = REGNO(PARAM(0));
 	}
 	else // here store in VM memory
 	{
-		int2char();
-		VMMEM((pc + PARAM(1) % IDX_MOD) % MEM_SIZE) = REGNO(PARAM(0));
+		int2char(CURPC, 0, REG_SIZE, PARAM(0));
+		//VMMEM((CURPC + PARAM(1) % IDX_MOD) % MEM_SIZE) = REGNO(PARAM(0));
 		printf("st(): param0: %d, param1: %d, reg%d: %d\n", PARAM(0), PARAM(1), PARAM(0), REGNO(PARAM(0)));
 	}
 	CARRY = 1;
@@ -88,8 +87,8 @@ void	st(int pc)
  * add r2,r3,r5 adds r2 and r3 and stores the result in r5.
 */
 
-//int	add(int pc)
-void	add(int pc)
+//int	add(t_process **processes, t_process *active_process)
+void	add(t_process **processes, t_process *active_process)
 {
 	printf("add() : adding r%d(%d) and r%d(%d)", PARAM(0), REGNO(PARAM(0)), PARAM(1), REGNO(PARAM(1)));
 	if (TPARAM(0) == TREG && TPARAM(1) == TREG && TPARAM(2) == TREG)
@@ -111,8 +110,8 @@ void	add(int pc)
  * Same effect as add, but with a substraction
  * atm, sub r1,r2,r3 -> r3 = r1 - r2. Have to be confirmed
 */
-//int	sub(int pc)
-void	sub(int pc)
+//int	sub(t_process **processes, t_process *active_process)
+void	sub(t_process **processes, t_process *active_process)
 {
 		printf("sub() : soustracting r%d(%d) and r%d(%d)", PARAM(0), REGNO(PARAM(0)), PARAM(1), REGNO(PARAM(1)));
 	if (TPARAM(0) == TREG && TPARAM(1) == TREG && TPARAM(2) == TREG)
@@ -135,8 +134,8 @@ void	sub(int pc)
  * This operation modifies the carry. and r2, %0,r3 stores r2 & 0 in r3.
 */
 
-//int	and(int pc)
-void	and(int pc)
+//int	and(t_process **processes, t_process *active_process)
+void	and(t_process **processes, t_process *active_process)
 {
 	printf("and() : ");
 	if (TPARAM(2) == TREG)
@@ -144,19 +143,19 @@ void	and(int pc)
 		if (TPARAM(0) == TREG && TPARAM(1) == TREG)
 			REGNO(PARAM(2)) = REGNO(PARAM(0)) & REGNO(PARAM(1));
 		else if (TPARAM(0) == TREG && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = REGNO(PARAM(0)) & VMMEM((pc + PARAM(1) % IDX_MOD) % MEM_SIZE);
+			REGNO(PARAM(2)) = REGNO(PARAM(0)) & VMMEM((CURPC + PARAM(1) % IDX_MOD) % MEM_SIZE);
 		else if (TPARAM(0) == TREG && TPARAM(1) == TDIR)
 			REGNO(PARAM(2)) = REGNO(PARAM(0)) & (PARAM(1));
 		else if (TPARAM(0) == TIND && TPARAM(1) == TREG)
-			REGNO(PARAM(2)) = VMMEM((pc + PARAM(0) % IDX_MOD) % MEM_SIZE) & REGNO(PARAM(1));
+			REGNO(PARAM(2)) = VMMEM((CURPC + PARAM(0) % IDX_MOD) % MEM_SIZE) & REGNO(PARAM(1));
 		else if (TPARAM(0) == TIND && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) & VMMEM((pc + PARAM(1) % IDX_MOD) % MEM_SIZE);
+			REGNO(PARAM(2)) = VMMEM(CURPC + PARAM(0) % IDX_MOD) & VMMEM((CURPC + PARAM(1) % IDX_MOD) % MEM_SIZE);
 		else if (TPARAM(0) == TIND && TPARAM(1) == TDIR)
-			REGNO(PARAM(2)) = VMMEM((pc + PARAM(0) % IDX_MOD) % MEM_SIZE) & PARAM(1);
+			REGNO(PARAM(2)) = VMMEM((CURPC + PARAM(0) % IDX_MOD) % MEM_SIZE) & PARAM(1);
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TREG)
 			REGNO(PARAM(2)) = PARAM(0) & REGNO(PARAM(1));
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = PARAM(0) & VMMEM((pc + PARAM(1) % IDX_MOD) % MEM_SIZE);
+			REGNO(PARAM(2)) = PARAM(0) & VMMEM((CURPC + PARAM(1) % IDX_MOD) % MEM_SIZE);
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TDIR)
 			REGNO(PARAM(2)) = PARAM(0) & PARAM(1);
 		// NEED TO DOUBLE CHECK AND MAYBE TERNAIRE ALL THIS SHIT
@@ -176,8 +175,8 @@ void	and(int pc)
  * Same as and but with an or (| in C)
 */
 
-//int	or(int pc)
-void	or(int pc)
+//int	or(t_process **processes, t_process *active_process)
+void	or(t_process **processes, t_process *active_process)
 {
 	printf("or() : ");
 	if (TPARAM(2) == TREG)
@@ -185,19 +184,19 @@ void	or(int pc)
 		if (TPARAM(0) == TREG && TPARAM(1) == TREG)
 			REGNO(PARAM(2)) = REGNO(PARAM(0)) | REGNO(PARAM(1));
 		else if (TPARAM(0) == TREG && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = REGNO(PARAM(0)) | VMMEM(pc + PARAM(1) % IDX_MOD);
+			REGNO(PARAM(2)) = REGNO(PARAM(0)) | VMMEM((CURPC + PARAM(1) % IDX_MOD) % MEM_SIZE);
 		else if (TPARAM(0) == TREG && TPARAM(1) == TDIR)
 			REGNO(PARAM(2)) = REGNO(PARAM(0)) | (PARAM(1));
 		else if (TPARAM(0) == TIND && TPARAM(1) == TREG)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) | REGNO(PARAM(1));
+			REGNO(PARAM(2)) = VMMEM((CURPC + PARAM(0) % IDX_MOD) % MEM_SIZE) | REGNO(PARAM(1));
 		else if (TPARAM(0) == TIND && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) | VMMEM(pc + PARAM(1) % IDX_MOD);
+			REGNO(PARAM(2)) = VMMEM((CURPC + PARAM(0) % IDX_MOD) % MEM_SIZE) | VMMEM((CURPC + PARAM(1) % IDX_MOD) % MEM_SIZE);
 		else if (TPARAM(0) == TIND && TPARAM(1) == TDIR)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) | PARAM(1);
+			REGNO(PARAM(2)) = VMMEM((CURPC + PARAM(0) % IDX_MOD) % MEM_SIZE) | PARAM(1);
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TREG)
 			REGNO(PARAM(2)) = PARAM(0) | REGNO((PARAM(1)));
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = PARAM(0) | VMMEM(pc + PARAM(1) % IDX_MOD);
+			REGNO(PARAM(2)) = PARAM(0) | VMMEM((CURPC + PARAM(1) % IDX_MOD) % MEM_SIZE);
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TDIR)
 			REGNO(PARAM(2)) = PARAM(0) | PARAM(1);
 		// NEED TO DOUBLE CHECK AND MAYBE TERNAIRE ALL THIS SHIT
@@ -218,8 +217,8 @@ void	or(int pc)
  * Same as and but with an xor (^ in C)
 */
 
-//int	xor(int pc)
-void	xor(int pc)
+//int	xor(t_process **processes, t_process *active_process)
+void	xor(t_process **processes, t_process *active_process)
 {
 	printf("xor() : ");
 	if (TPARAM(2) == TREG)
@@ -227,19 +226,19 @@ void	xor(int pc)
 		if (TPARAM(0) == TREG && TPARAM(1) == TREG)
 			REGNO(PARAM(2)) = REGNO(PARAM(0)) ^ REGNO(PARAM(1));
 		else if (TPARAM(0) == TREG && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = REGNO(PARAM(0)) ^ VMMEM(pc + PARAM(1) % IDX_MOD);
+			REGNO(PARAM(2)) = REGNO(PARAM(0)) ^ VMMEM((CURPC + PARAM(1) % IDX_MOD) % MEM_SIZE);
 		else if (TPARAM(0) == TREG && TPARAM(1) == TDIR)
 			REGNO(PARAM(2)) = REGNO(PARAM(0)) ^ (PARAM(1));
 		else if (TPARAM(0) == TIND && TPARAM(1) == TREG)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) ^ REGNO(PARAM(1));
+			REGNO(PARAM(2)) = VMMEM((CURPC + PARAM(0) % IDX_MOD) % MEM_SIZE) ^ REGNO(PARAM(1));
 		else if (TPARAM(0) == TIND && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) ^ VMMEM(pc + PARAM(1) % IDX_MOD);
+			REGNO(PARAM(2)) = VMMEM((CURPC + PARAM(0) % IDX_MOD) % MEM_SIZE) ^ VMMEM((CURPC + PARAM(1) % IDX_MOD) % MEM_SIZE);
 		else if (TPARAM(0) == TIND && TPARAM(1) == TDIR)
-			REGNO(PARAM(2)) = VMMEM(pc + PARAM(0) % IDX_MOD) ^ PARAM(1);
+			REGNO(PARAM(2)) = VMMEM((CURPC + PARAM(0) % IDX_MOD) % MEM_SIZE) ^ PARAM(1);
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TREG)
 			REGNO(PARAM(2)) = PARAM(0) ^ REGNO((PARAM(1)));
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TIND)
-			REGNO(PARAM(2)) = PARAM(0) ^ VMMEM(pc + PARAM(1) % IDX_MOD);
+			REGNO(PARAM(2)) = PARAM(0) ^ VMMEM((CURPC + PARAM(1) % IDX_MOD) % MEM_SIZE);
 		else if (TPARAM(0) == TDIR && TPARAM(1) == TDIR)
 			REGNO(PARAM(2)) = PARAM(0) ^ PARAM(1);
 		// NEED TO DOUBLE CHECK AND MAYBE TERNAIRE ALL THIS SHIT
@@ -256,20 +255,30 @@ void	xor(int pc)
 }
 
 /*
- *
+ *							zjmp(0x09)
+ * Cette instruction n’est pas suivie d’octet pour décrire les
+ * paramètres. Elle prend toujours un index (IND_SIZE) et fait un
+ * saut à cet index si le carry est à un. Si le carry est nul, zjmp ne
+ * fait rien mais consomme le même temps.
+ * zjmp %23 met, si carry == 1, (PC + (23 % IDX_MOD)) dans le
+ * PC.
 */
 
-//int	(int pc)
-/*
-void	(int pc)
+//int	(t_process **processes, t_process *active_process)
+void	zjump(t_process **processes, t_process *active_process)
 {
-
+	printf("zjump(), carry = %d, old pc : %d\n", CARRY, CURPC);
+	if (CARRY == 0)
+		return ;
+	else
+			CURPC = CURPC + (char2int(CURPC, 0, IND_SIZE) % IDX_MOD);
+	printf("new pc = %d\n", CURPC);
 }
-*/
+
 
 
 /* calculate position of next program counter
-int	calc_next_pc()
+int	calc_next_CURPC()
 {
 
 }
