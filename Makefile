@@ -18,8 +18,8 @@ SRC			= main.c \
 			  vm.c \
 			  vm_loop.c \
 			  ops.c \
-			  vm/fetch_cur_ops.c \
-			  vm/load_champions.c
+			  fetch_cur_ops.c \
+			  load_champions.c
 
 OBJ			= $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 

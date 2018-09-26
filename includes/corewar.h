@@ -25,7 +25,14 @@
 #define OR 		7 
 #define XOR		8
 #define ZJUMP	9
-
+#define LDI		10
+#define STI		11
+#define FORK	12
+#define LLD		13
+#define LLDI	14
+#define LFORK	15
+#define LFORK	15
+#define AFF		16
 
 #define REGNO(i)	active_process->exec_env.regno[i]
 #define PARAM(i) 	active_process->cur_op.params.no[i]
@@ -119,15 +126,22 @@ typedef struct	s_process
 
 
 /* instructions */
-void	live(t_process **processes, t_process *active_process);
-void	ld(t_process **processes, t_process *active_process);
-void	st(t_process **processes, t_process *active_process);
-void	add(t_process **processes, t_process *active_process);
-void	sub(t_process **processes, t_process *active_process);
-void	and(t_process **processes, t_process *active_process);
-void	or(t_process **processes, t_process *active_process);
-void	xor(t_process **processes, t_process *active_process);
-void	zjump(t_process **processes, t_process *active_process);
+void	inst_live(t_process **processes, t_process *active_process);
+void	inst_ld(t_process **processes, t_process *active_process);
+void	inst_st(t_process **processes, t_process *active_process);
+void	inst_add(t_process **processes, t_process *active_process);
+void	inst_sub(t_process **processes, t_process *active_process);
+void	inst_and(t_process **processes, t_process *active_process);
+void	inst_or(t_process **processes, t_process *active_process);
+void	inst_xor(t_process **processes, t_process *active_process);
+void	inst_zjump(t_process **processes, t_process *active_process);
+void	inst_ldi(t_process **processes, t_process *active_process);
+void	inst_sti(t_process **processes, t_process *active_process);
+void	inst_fork(t_process **processes, t_process *active_process);
+void	inst_lld(t_process **processes, t_process *active_process);
+void	inst_lldi(t_process **processes, t_process *active_process);
+void	inst_lfork(t_process **processes, t_process *active_process);
+void	inst_aff(t_process **processes, t_process *active_process);
 
 /* util.c */
 void	print_usage();
@@ -139,7 +153,7 @@ void    vm_loop();
 //void	exec(int pc);
 //void    exec(t_process **processes, t_process *active_process);
 int		char2int(int pc, int inc, int size);
-void	int2char(t_process *active_process, int pc, int inc, int size, int regno);
+void	int2char(int pc, int size, int regno);
 
 
 /* load_champions.c */

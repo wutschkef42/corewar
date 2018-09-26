@@ -3,7 +3,8 @@
 
 
 
-void (*g_ops[])(t_process **processes, t_process *active_process) = {0, live, ld, st, add, sub, and, or, xor};
+void (*g_ops[])(t_process **processes, t_process *active_process) = {0, inst_live, inst_ld, inst_st, inst_add, inst_sub, 
+inst_and, inst_or, inst_xor, inst_zjump, inst_ldi, inst_sti, inst_fork, inst_lld, inst_lldi, inst_lfork, inst_aff};
 
 
 
@@ -11,7 +12,7 @@ void	init_vm()
 {
 	g_vm.dump_flag = -1;
 	g_vm.nchampions = 0;
-	g_vm.nprocesses = 0;
+	g_vm.max_pid = 0;
 }
 
 

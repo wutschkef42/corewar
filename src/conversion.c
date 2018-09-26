@@ -7,14 +7,14 @@
 * convert an integer into between 1 and 4 chars
 */
 
-void	int2char(t_process *active_process, int pc, int inc, int size, int regno)
+void	int2char(int pc, int size, int to_conv)
 {
 	int i;
 
 	i = 0;
 	while(i < size)
 	{
-		VMMEM(pc + inc + size - 1 - i) = (REGNO(regno) << (i * 8)) & 0XFF;
+		VMMEM((pc + size - 1 - i) % MEM_SIZE) = (to_conv >> (i * 8)) & 0XFF;
 		i++;
 	}
 }

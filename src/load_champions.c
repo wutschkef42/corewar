@@ -71,7 +71,7 @@ static void	load_champion(int *nchampion, int *cur_arg, char **av, t_process **p
 	ft_printf("pc = %d\n", champion->exec_env.pc);
 	load_binary(av[*cur_arg], champion->exec_env.pc, champion);
 	add_to_process_list(processes, champion);
-	g_vm.nprocesses += 1;
+	g_vm.max_pid += 1;
 	*cur_arg += 1;
 	*nchampion += 1;
 
