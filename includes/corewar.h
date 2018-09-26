@@ -92,7 +92,7 @@ typedef struct	s_op
 	int		cooldown;
 	char	*descr;
 	int		affect_carry;
-	int		index;
+	int		dirsize;//
 }				t_op;
 
 

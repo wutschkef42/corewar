@@ -28,7 +28,7 @@ t_op    op_tab[17] =
     {"lfork", 1, {T_DIR}, 15, 1000, "long fork", 0, 1},
     {"aff", 1, {T_REG}, 16, 2, "aff", 1, 0}
 };
-
+//WE NEED TO SUBSTRACT TDIR BY THE LAST PARAM OF OP TAB * 2
 
 /* calculates how many bytes the params take up */
 static int     size_of_params(t_cur_op op)

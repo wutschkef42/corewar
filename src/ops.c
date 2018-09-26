@@ -265,7 +265,7 @@ void	inst_zjump(t_process **processes, t_process *active_process)
 	if (CARRY == 0)
 		return ;
 	else
-			CURPC = (CURPC + (char2int(CURPC, 0, IND_SIZE)) % IDX_MOD) % MEM_SIZE);
+			CURPC = (CURPC + (char2int(CURPC, 0, IND_SIZE)) % IDX_MOD) % MEM_SIZE;
 	printf("new pc = %d\n", CURPC);
 }
 
