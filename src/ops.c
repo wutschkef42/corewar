@@ -12,7 +12,7 @@ void	inst_live(t_process **processes, t_process *active_process)
 	unsigned int	n;
 
 	printf("byte1: %hhX, byte2: %hhX, byte3: %hhX, byte4: %hhX\n", VMMEM(CURPC + 1), VMMEM(CURPC + 2), VMMEM(CURPC + 3), VMMEM(CURPC + 4));
-	n = (VMMEM(CURPC + 1) << 24) | ((unsigned char)(VMMEM(CURPC +2)) << 16) | ((unsigned char)(VMMEM(CURPC + 3)) << 8) | (unsigned char)VMMEM(CURPC + 4);
+	n = (VMMEM((CURPC + 1) % MEM_SIZE) << 24) | ((unsigned char)(VMMEM(CURPC + 2)) << 16) | ((unsigned char)(VMMEM(CURPC + 3)) << 8) | (unsigned char)VMMEM(CURPC + 4);
 	printf("I'm alive %d(player_name)\n", n);
 	ISALIVE = 1;
 }
@@ -300,9 +300,7 @@ void	inst_ldi(t_process **processes, t_process *active_process)
  * Parameters 2 and 3 are indexes. 
  * If they are, in fact, registers, we’ll use their contents as indexes.
  * sti r2,%4,%5 sti copie REG_SIZE octet de r2 a l’adresse (4 + 5)
-Les paramètres 2 et 3 sont des index. Si les paramètres 2 ou 3 sont
-des registres, on utilisera leur contenu comme un index.
-T_REG, T_REG | T_DIR | T_IND, T_DIR | T_REG
+
 */
 //int	inst_sti(t_process **processes, t_process *active_process)
 void	inst_sti(t_process **processes, t_process *active_process)
@@ -336,7 +334,28 @@ void	inst_sti(t_process **processes, t_process *active_process)
 //int	inst_fork(t_process **processes, t_process *active_process)
 void	inst_fork(t_process **processes, t_process *active_process)
 {
-////////////////////////////////
+	int i;
+	t_process	*new_child;
+
+	i = -1;
+	if (!(new_child = (t_process*)malloc(sizeof(t_process))))
+	{
+		ft_printf("error forking process\n");
+		CARRY = 0;
+		return ;
+	}
+	new_child->pid = ++g_vm.max_pid;
+	new_child->program_number = active_process->program_number;
+	ft_memccpy(new_child->name, active_process->name, 0, PROG_NAME_LENGTH);
+	new_child->exec_env.pc = (CURPC + (PARAM(0) % IDX_MOD)) % MEM_SIZE;
+	while(++i < REG_NUMBER)
+		new_child->exec_env.regno[i] = active_process->exec_env.regno[i];
+	new_child->exec_env.carry = active_process->exec_env.carry;
+	new_child->exec_env.is_alive = 0;
+	new_child->cur_op.opcode = g_vm.vm_mem[new_child->exec_env.pc];
+	new_child->cur_op.cooldown = op_tab[new_child->cur_op.opcode].cooldown;
+	add_to_process_list(processes, new_child);
+	CARRY = 1;
 }
 
 /*								lld(0x0d
@@ -400,7 +419,28 @@ void	inst_lldi(t_process **processes, t_process *active_process)
 //int	inst_lfork(t_process **processes, t_process *active_process)
 void	inst_lfork(t_process **processes, t_process *active_process)
 {
-	/////////////////////////////
+	int i;
+	t_process	*new_child;
+
+	i = -1;
+	if (!(new_child = (t_process*)malloc(sizeof(t_process))))
+	{
+		ft_printf("error forking process\n");
+		CARRY = 0;
+		return ;
+	}
+	new_child->pid = ++g_vm.max_pid;
+	new_child->program_number = active_process->program_number;
+	ft_memccpy(new_child->name, active_process->name, 0, PROG_NAME_LENGTH);
+	new_child->exec_env.pc = (CURPC + PARAM(0)) % MEM_SIZE;
+	while(++i < REG_NUMBER)
+		new_child->exec_env.regno[i] = active_process->exec_env.regno[i];
+	new_child->exec_env.carry = active_process->exec_env.carry;
+	new_child->exec_env.is_alive = 0;
+	new_child->cur_op.opcode = g_vm.vm_mem[new_child->exec_env.pc];
+	new_child->cur_op.cooldown = op_tab[new_child->cur_op.opcode].cooldown;
+	add_to_process_list(processes, new_child);
+	CARRY = 1;
 }
 
 /*								aff(0x10)
