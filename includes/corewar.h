@@ -3,6 +3,7 @@
 # define COREWAR_H
 
 #include "op.h"
+#include "libft.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -44,7 +45,7 @@
 #define CURPC		active_process->exec_env.pc
 #define CARRY		active_process->exec_env.carry
 #define ISALIVE		active_process->exec_env.is_alive
-
+#define CUROP		active_process->cur_op.opcode
 //#define CUROP(pc) 	g_vm.vm_mem[pc] //g_env.cur_op.opcode
 
 
