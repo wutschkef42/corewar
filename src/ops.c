@@ -60,24 +60,17 @@ void	inst_ld(t_process **processes, t_process *active_process)
 //int	inst_st(t_process **processes, t_process *active_process)
 void	inst_st(t_process **processes, t_process *active_process)
 {
-	if (TPARAM(0) != TREG)
-	{
-		//printf(stderr, "wrong parameters type in instruction sub");
-		CARRY = 0;
-		return ;
-	}
 	printf("store()");
+	if (TPARAM(0) != TREG)
+		return ;
 	if (TPARAM(1) == TREG) // here store in register
-	{
 		REGNO(PARAM(1)) = REGNO(PARAM(0));
-	}
 	else // here store in VM memory
 	{
 		int2char(CURPC + (PARAM(1) % IDX_MOD), REG_SIZE, REGNO(PARAM(0)));
 		//VMMEM((CURPC + PARAM(1) % IDX_MOD) % MEM_SIZE) = REGNO(PARAM(0));
 		printf("st(): param0: %d, param1: %d, reg%d: %d\n", PARAM(0), PARAM(1), PARAM(0), REGNO(PARAM(0)));
 	}
-	CARRY = 1;
 }
 
 /* 								add(0x04)
@@ -282,6 +275,7 @@ void	inst_ldi(t_process **processes, t_process *active_process)
 	int sum;
 
 	sum = 0;
+	printf("i()\n");
 	if(!TPARAM(0) || TPARAM(1 == TIND || TPARAM(3) != TREG))
 		{
 			CARRY = 0;
@@ -305,12 +299,31 @@ void	inst_ldi(t_process **processes, t_process *active_process)
  * sti r2,%4,%5 sti copies REG_SIZE bytes of r2 at address (4 + 5) 
  * Parameters 2 and 3 are indexes. 
  * If they are, in fact, registers, we’ll use their contents as indexes.
- * 
+ * sti r2,%4,%5 sti copie REG_SIZE octet de r2 a l’adresse (4 + 5)
+Les paramètres 2 et 3 sont des index. Si les paramètres 2 ou 3 sont
+des registres, on utilisera leur contenu comme un index.
+T_REG, T_REG | T_DIR | T_IND, T_DIR | T_REG
 */
 //int	inst_sti(t_process **processes, t_process *active_process)
 void	inst_sti(t_process **processes, t_process *active_process)
 {
-///////////////////////////
+	int sum;
+
+	sum = 0;
+	printf("sti()\n");
+	if (TPARAM(0) != TREG)
+		return ;
+	if (TPARAM(1) == TREG)
+		sum += REGNO(PARAM(1));
+	else if (TPARAM(1) == TIND)
+		sum += char2int(CURPC + (PARAM(1) % IDX_MOD), 0, IND_SIZE);//CARE NEED CIRCULAR MEMORY
+	else if (TPARAM(1) == TDIR)
+		sum += PARAM(1);
+	if (TPARAM(2) == TREG)
+		sum += REGNO(PARAM(2));
+	else if (TPARAM(2) == TDIR)
+		sum += PARAM(2);
+	int2char((CURPC + sum) % MEM_SIZE, REG_SIZE, REGNO(PARAM(0)));
 }
 
 /*								fork(0x0c)
@@ -360,6 +373,7 @@ void	inst_lldi(t_process **processes, t_process *active_process)
 		int sum;
 
 	sum = 0;
+	printf("lldi () \n");
 	if(!TPARAM(0) || TPARAM(1 == TIND || TPARAM(3) != TREG))
 		{
 			CARRY = 0;
@@ -400,6 +414,7 @@ void	inst_lfork(t_process **processes, t_process *active_process)
 //int	inst_aff(t_process **processes, t_process *active_process)
 void	inst_aff(t_process **processes, t_process *active_process)
 {
+	printf("aff() \n");
 	if (TPARAM(0) == TREG)
 		ft_printf("%c", PARAM(0) % 256);
 }
