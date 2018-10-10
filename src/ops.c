@@ -12,9 +12,10 @@ void	inst_live(t_process **processes, t_process *active_process)
 	unsigned int	n;
 
 	printf("byte1: %hhX, byte2: %hhX, byte3: %hhX, byte4: %hhX\n", VMMEM(CURPC + 1), VMMEM(CURPC + 2), VMMEM(CURPC + 3), VMMEM(CURPC + 4));
-	n = (VMMEM((CURPC + 1) % MEM_SIZE) << 24) | ((unsigned char)(VMMEM(CURPC + 2)) << 16) | ((unsigned char)(VMMEM(CURPC + 3)) << 8) | (unsigned char)VMMEM(CURPC + 4);
+	n = (VMMEM((CURPC + 1) % MEM_SIZE) << 24) | ((unsigned char)(VMMEM(CURPC + 2) % MEM_SIZE) << 16) | ((unsigned char)(VMMEM(CURPC + 3) % MEM_SIZE) << 8) | (unsigned char)VMMEM((CURPC + 4) % MEM_SIZE);
 	printf("I'm alive %d(player_name)\n", n);
 	ISALIVE = 1;
+	//gotta check if match with a player
 }
 
 /*								load(0x02)
@@ -437,7 +438,7 @@ void	inst_lfork(t_process **processes, t_process *active_process)
 		new_child->exec_env.regno[i] = active_process->exec_env.regno[i];
 	new_child->exec_env.carry = active_process->exec_env.carry;
 	new_child->exec_env.is_alive = 0;
-	new_child->cur_op.opcode = g_vm.vm_mem[new_child->exec_env.pc];
+	new_child->cur_op.opcode = g_vm.vm_mem[(new_child->exec_env.pc) % MEM_SIZE];
 	new_child->cur_op.cooldown = op_tab[new_child->cur_op.opcode].cooldown;
 	add_to_process_list(processes, new_child);
 	CARRY = 1;

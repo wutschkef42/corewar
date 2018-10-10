@@ -29,22 +29,22 @@ int		char2int(int pc, int inc, int size)
 	unsigned int	ret;
 	char			is_neg;
 
-	is_neg = (g_vm.vm_mem[pc+inc] & 0xA0) ? 1 : 0;
+	is_neg = (g_vm.vm_mem[(pc + inc) % MEM_SIZE] & 0xA0) ? 1 : 0;
 	ret = 0;
 	if (size == 1)
-		ret = (is_neg) ? g_vm.vm_mem[pc+inc] | 0xFFFFFF << 8 : g_vm.vm_mem[pc+inc];
+		ret = (is_neg) ? g_vm.vm_mem[(pc + inc) % MEM_SIZE] | 0xFFFFFF << 8 : g_vm.vm_mem[(pc + inc) % MEM_SIZE];
 	else if (size == 2)
 	{
-		ret = (g_vm.vm_mem[pc+inc] << 8) | (unsigned char)g_vm.vm_mem[pc+inc+1];
+		ret = (g_vm.vm_mem[(pc + inc) % MEM_SIZE] << 8) | (unsigned char)g_vm.vm_mem[pc + inc + 1];
 		ret = (is_neg) ? ret | 0xFFFF << 16 : ret;
 	}
 	else if (size == 3)
 	{
-		ret = (g_vm.vm_mem[pc+inc] << 16) | ((unsigned char)(g_vm.vm_mem[pc+inc+1]) << 8) | (unsigned char)g_vm.vm_mem[pc+inc+2];
+		ret = (g_vm.vm_mem[(pc + inc) % MEM_SIZE] << 16) | ((unsigned char)(g_vm.vm_mem[(pc + inc + 1) % MEM_SIZE]) << 8) | (unsigned char)g_vm.vm_mem[(pc + inc + 2) % MEM_SIZE];
 		ret = (is_neg) ? ret | 0xFF << 8 : ret;
 	}
 	else if (size == 4)
-		ret = (g_vm.vm_mem[pc+inc] << 24) | ((unsigned char)(g_vm.vm_mem[pc+inc+1]) << 16) | ((unsigned char)(g_vm.vm_mem[pc+inc+2]) << 8) | (unsigned char)g_vm.vm_mem[pc+inc+3];	
+		ret = (g_vm.vm_mem[(pc + inc) % MEM_SIZE] << 24) | ((unsigned char)(g_vm.vm_mem[(pc + inc + 1) % MEM_SIZE]) << 16) | ((unsigned char)(g_vm.vm_mem[(pc + inc + 2) % MEM_SIZE]) << 8) | (unsigned char)g_vm.vm_mem[(pc + inc + 3) % MEM_SIZE];	
 	else
 		ft_printf("ERROR: IND_SIZE too big.\n");			
 	return (ret);

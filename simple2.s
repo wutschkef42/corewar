@@ -7,4 +7,9 @@
 	and r1,r2,r3
 	or	r1,r2,r4
 	xor r1,r2,r5
-	st	r1, 115
+	st	r1, 120
+	st	r2, 115
+	st	r3, 130
+	st	r4, 125
+	st	r5, 110
+	st	r6, 105

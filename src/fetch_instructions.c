@@ -79,11 +79,12 @@ void    fetch_new_cur_ops(t_process *processes)
     {
         if (processes->cur_op.cooldown == 0)
         {
-            processes->exec_env.pc += calc_instruction_size(processes->cur_op);
-            processes->cur_op.opcode = VMMEM(processes->exec_env.pc);
+            if ( processes->exec_env.pc != ZJUMP)
+                processes->exec_env.pc = (processes->exec_env.pc + calc_instruction_size(processes->cur_op)) % MEM_SIZE;
+            processes->cur_op.opcode = VMMEM((processes->exec_env.pc) % MEM_SIZE);
             processes->cur_op.cooldown = op_tab[processes->cur_op.opcode].cooldown; // !!! POTENTIAL BUS ERROR
-            memset((void*)processes->cur_op.params.no, 0, sizeof(processes->cur_op.params.no)); // reset cooled down params
-            memset((void*)processes->cur_op.params.type, 0, sizeof(processes->cur_op.params.type)); // reset cooled down params
+            ft_memset((void*)processes->cur_op.params.no, 0, sizeof(processes->cur_op.params.no)); // reset cooled down params
+            ft_memset((void*)processes->cur_op.params.type, 0, sizeof(processes->cur_op.params.type)); // reset cooled down params
         }
         processes = processes->next;
     }
